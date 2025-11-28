@@ -5,21 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { MultiSelect } from "@/components/multi-select";
-import { Search, ShoppingBag, MessageCircle } from "lucide-react";
+import { Search } from "lucide-react";
 import Image from "next/image";
+import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Product, Category } from "@/types";
-import { siteConfig } from "@/lib/config";
+import { PageHeader } from "@/components/custom/page-header";
+import { SearchContainer } from "@/components/custom/search-container";
 
 interface ProductsClientPageProps {
   initialProducts: Product[];
@@ -43,37 +37,37 @@ export default function ProductsClientPage({ initialProducts, categories }: Prod
     return matchesSearch && matchesCategory;
   });
 
-
-
   return (
-    <div className="container py-12 px-4 min-h-screen">
-      <div className="max-w-6xl mx-auto space-y-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold text-primary">Catálogo de Produtos</h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Produtos frescos e artesanais, direto do produtor para sua mesa.
-            Intermediamos o contato para garantir a melhor qualidade.
-          </p>
-        </div>
+    <div className="min-h-screen bg-gray-50/50">
+      <PageHeader
+        title="Nossos Produtos"
+        description="Do campo direto para sua mesa. Descubra o sabor autêntico da produção familiar local."
+        imageSrc="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?q=80&w=2940&auto=format&fit=crop"
+        height="h-[300px]"
+      />
+
+      <div className="container py-8 px-4 relative z-10">
+        <div className="max-w-7xl mx-auto space-y-8">
 
         {/* Filters */}
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between sticky top-20 z-40 bg-background/95 backdrop-blur py-4 border-b">
-            <div className="relative w-full md:w-96">
+          <SearchContainer className="flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div className="relative w-full flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Buscar produtos..."
-                className="pl-10"
+                className="pl-10 h-12 bg-gray-50 border-gray-200 focus:bg-white transition-colors"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             <div className="flex gap-2 w-full md:w-auto">
               <div className="w-full md:w-72">
-            <MultiSelect
+                <MultiSelect
                   options={categories.map(c => ({ label: c.name, value: c.id }))}
                   selected={selectedCategories}
                   onChange={setSelectedCategories}
                   placeholder="Filtrar por categorias..."
+                  className="h-12 bg-gray-50 border-gray-200 focus:bg-white focus:ring-2 focus:ring-ring/50 focus:ring-offset-0 transition-colors"
                 />
               </div>
               {(searchTerm || selectedCategories.length > 0) && (
@@ -83,13 +77,13 @@ export default function ProductsClientPage({ initialProducts, categories }: Prod
                     setSearchTerm("");
                     setSelectedCategories([]);
                   }}
-                  className="shrink-0"
+                  className="shrink-0 h-12 px-6 hover:bg-gray-100 hover:text-foreground"
                 >
                   Limpar
                 </Button>
               )}
             </div>
-          </div>
+          </SearchContainer>
 
         {/* Product Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -103,8 +97,9 @@ export default function ProductsClientPage({ initialProducts, categories }: Prod
             >
               <Card className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-all duration-300 group border-none shadow-md">
                 <div className="relative h-56 w-full overflow-hidden">
-                  <Image
-                    src={product.imageUrl || "https://images.unsplash.com/photo-1506617420156-8e4536971650?w=800&q=80"}
+                  <ImageWithFallback
+                    src={product.imageUrl}
+                    fallbackType="product"
                     alt={product.name}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -160,5 +155,6 @@ export default function ProductsClientPage({ initialProducts, categories }: Prod
         )}
       </div>
     </div>
+  </div>
   );
 }

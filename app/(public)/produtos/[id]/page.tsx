@@ -1,12 +1,14 @@
 import { supabase } from "@/lib/supabase";
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, MessageCircle, Mail, MapPin, User } from "lucide-react";
 import { siteConfig } from "@/lib/config";
 import { Card, CardContent } from "@/components/ui/card";
+import { ProducerList } from "@/components/custom/producer-list";
 
 export const dynamic = 'force-dynamic';
 
@@ -47,26 +49,44 @@ export default async function ProductPage({ params }: ProductPageProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const categoryNames = product.product_categories.map((pc: any) => pc.categories.name);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const associate = product.associate_products[0]?.associates;
+  const associates = product.associate_products.map((ap: any) => ap.associates);
 
   return (
-    <div className="container py-12 px-4 min-h-screen">
-      <Button variant="ghost" asChild className="mb-8 hover:bg-transparent hover:text-primary pl-0">
-        <Link href="/produtos" className="flex items-center gap-2">
-          <ArrowLeft className="h-4 w-4" />
-          Voltar para o catálogo
-        </Link>
-      </Button>
+    <div className="min-h-screen bg-gray-50/50">
+      {/* Hero Banner */}
+      <div className="relative h-[300px] w-full overflow-hidden">
+        <Image
+          src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?q=80&w=2940&auto=format&fit=crop"
+          alt="Farm background"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-transparent" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="container px-4">
+            <Button variant="outline" asChild className="bg-white/10 text-white border-white/20 hover:bg-white/20 hover:text-white backdrop-blur-sm">
+              <Link href="/produtos" className="flex items-center gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                Voltar para o catálogo
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </div>
 
-      <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+      <div className="container py-12 px-4 -mt-20 relative z-10">
+        <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto bg-white rounded-2xl shadow-xl p-8">
         {/* Product Image */}
         <div className="relative aspect-square w-full rounded-xl overflow-hidden shadow-lg bg-muted">
-          <Image
-            src={product.image_url || "https://images.unsplash.com/photo-1506617420156-8e4536971650?w=800&q=80"}
+          <ImageWithFallback
+            src={product.image_url}
+            fallbackType="product"
             alt={product.name}
             fill
             className="object-cover"
             priority
+            iconClassName="h-32 w-32"
           />
         </div>
 
@@ -82,21 +102,18 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-primary mb-4">{product.name}</h1>
             
-            {associate && (
-              <Link href={`/associados/${associate.id}`} className="inline-flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors group">
-                <div className="relative h-10 w-10 rounded-full overflow-hidden border">
-                  <Image 
-                    src={associate.avatar_url || "https://github.com/shadcn.png"} 
-                    alt={associate.name}
-                    fill
-                    className="object-cover"
-                  />
+            {associates.length > 0 ? (
+              <ProducerList associates={associates} />
+            ) : (
+              <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/30 border border-transparent">
+                <div className="relative h-10 w-10 rounded-full overflow-hidden border bg-primary/10 flex items-center justify-center shrink-0">
+                  <User className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Produzido por</p>
-                  <p className="font-medium group-hover:text-primary transition-colors">{associate.name}</p>
+                  <p className="font-medium">Comunidade APFAM</p>
                 </div>
-              </Link>
+              </div>
             )}
           </div>
 
@@ -116,7 +133,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <div className="grid gap-3">
                 <Button asChild className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white h-12 text-lg">
                   <Link 
-                    href={`https://wa.me/${siteConfig.contact.whatsapp}?text=Olá, tenho interesse no produto *${product.name}* do produtor *${associate?.name}* que vi no site da APFAM.`}
+                    href={`https://wa.me/${siteConfig.contact.whatsapp}?text=Olá, tenho interesse no produto *${product.name}* ${
+                      associates.length > 0 
+                        ? `do(s) produtor(es) *${associates.map((a: any) => a.name).join(", ")}*` 
+                        : "da APFAM"
+                    } que vi no site.`}
                     target="_blank"
                   >
                     <MessageCircle className="h-5 w-5 mr-2" />
@@ -135,5 +156,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </div>
       </div>
     </div>
+  </div>
   );
 }

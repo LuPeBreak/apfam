@@ -5,8 +5,11 @@ import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { MapPin, Search, ArrowLeft } from "lucide-react";
 import Image from "next/image";
+import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import Link from "next/link";
 import { Associate } from "@/types";
+import { PageHeader } from "@/components/custom/page-header";
+import { SearchContainer } from "@/components/custom/search-container";
 
 interface AssociatesClientPageProps {
   initialAssociates: Associate[];
@@ -25,25 +28,28 @@ export default function AssociatesClientPage({ initialAssociates }: AssociatesCl
   });
 
   return (
-    <div className="container py-12 px-4 min-h-screen">
-      <div className="max-w-6xl mx-auto space-y-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold text-primary">Nossos Associados</h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Conheça as famílias e produtores que fazem parte da nossa história.
-          </p>
-        </div>
+    <div className="min-h-screen bg-gray-50/50">
+      <PageHeader
+        title="Nossos Associados"
+        description="Conheça as famílias e produtores que fazem parte da nossa história e levam qualidade à sua mesa."
+        imageSrc="https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?q=80&w=2940&auto=format&fit=crop"
+        height="h-[300px]"
+      />
 
-        {/* Search */}
-        <div className="max-w-md mx-auto relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar por nome, produto ou local..."
-            className="pl-10"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+      <div className="container py-8 px-4 relative z-10">
+        <div className="max-w-6xl mx-auto space-y-8">
+          
+          <SearchContainer>
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar por nome, produto ou local..."
+                className="pl-10 h-12 bg-gray-50 border-gray-200 focus:bg-white transition-colors"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </SearchContainer>
 
         {/* Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -51,8 +57,9 @@ export default function AssociatesClientPage({ initialAssociates }: AssociatesCl
             <Link key={associate.id} href={`/associados/${associate.id}`} className="block group h-full">
               <Card className="h-full overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300 bg-card flex flex-col">
                 <div className="relative h-56 w-full overflow-hidden">
-                  <Image
-                    src={associate.avatarUrl || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80"}
+                  <ImageWithFallback
+                    src={associate.avatarUrl}
+                    fallbackType="associate"
                     alt={associate.name}
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -115,7 +122,8 @@ export default function AssociatesClientPage({ initialAssociates }: AssociatesCl
             Nenhum associado encontrado para &quot;{searchTerm}&quot;.
           </div>
         )}
-      </div>
     </div>
+    </div>
+  </div>
   );
 }
