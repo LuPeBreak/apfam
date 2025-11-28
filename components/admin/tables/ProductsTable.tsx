@@ -41,6 +41,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Combobox } from "@/components/custom/combobox";
 import { ProductForm, ProductFormData } from "@/components/admin/forms/ProductForm";
 import { toast } from "sonner";
 
@@ -214,23 +215,14 @@ export function ProductsTable({ initialData, categories }: ProductsTableProps) {
         searchPlaceholder="Buscar produtos..."
         filterSlot={
           <div className="flex items-center gap-2">
-            <div className="w-[200px]">
-              <Select
-                value={selectedCategoryFilter}
-                onValueChange={setSelectedCategoryFilter}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Filtrar por categoria" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas as categorias</SelectItem>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="w-[250px]">
+              <Combobox
+                options={categories.map(c => ({ label: c.name, value: c.id }))}
+                value={selectedCategoryFilter === "all" ? "" : selectedCategoryFilter}
+                onChange={(val) => setSelectedCategoryFilter(val || "all")}
+                placeholder="Filtrar por categoria"
+                searchPlaceholder="Buscar categoria..."
+              />
             </div>
             {selectedCategoryFilter !== "all" && (
               <Button 

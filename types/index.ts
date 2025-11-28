@@ -12,6 +12,7 @@ export interface Product {
   imageUrl?: string;
   associateId?: string;
   associateName?: string;
+  associateCount?: number;
 }
 
 export interface Associate {

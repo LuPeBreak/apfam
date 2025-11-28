@@ -39,7 +39,8 @@ export default async function ProductsPage() {
     imageUrl: p.image_url,
     categoryIds: p.product_categories.map((pc: any) => pc.category_id),
     categoryNames: p.product_categories.map((pc: any) => pc.categories.name),
-    associateName: p.associate_products?.[0]?.associates?.name || "APFAM"
+    associateName: p.associate_products?.[0]?.associates?.name || "APFAM",
+    associateCount: p.associate_products?.length || 0
   }));
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

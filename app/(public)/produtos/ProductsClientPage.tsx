@@ -31,8 +31,11 @@ export default function ProductsClientPage({ initialProducts, categories }: Prod
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const filteredProducts = initialProducts.filter((product) => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          product.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    const searchLower = searchTerm.toLowerCase().trim();
+    
+    const matchesSearch = !searchLower || 
+                          product.name.toLowerCase().includes(searchLower) ||
+                          (product.description && product.description.toLowerCase().includes(searchLower));
     
     const matchesCategory = selectedCategories.length === 0 || 
                             (product.categoryIds && product.categoryIds.some(id => selectedCategories.includes(id)));
@@ -40,23 +43,7 @@ export default function ProductsClientPage({ initialProducts, categories }: Prod
     return matchesSearch && matchesCategory;
   });
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-    },
-  };
 
   return (
     <div className="container py-12 px-4 min-h-screen">
@@ -105,14 +92,15 @@ export default function ProductsClientPage({ initialProducts, categories }: Prod
           </div>
 
         {/* Product Grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map((product) => (
-            <motion.div key={product.id} variants={itemVariants}>
+            <motion.div 
+              key={product.id} 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              layout
+            >
               <Card className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-all duration-300 group border-none shadow-md">
                 <div className="relative h-56 w-full overflow-hidden">
                   <Image
@@ -126,8 +114,12 @@ export default function ProductsClientPage({ initialProducts, categories }: Prod
                   </Badge>
                 </div>
                 <CardHeader>
-                  <div className="text-xs text-muted-foreground mb-1">
-                    Produtor: <span className="font-medium text-primary">{product.associateName}</span>
+                  <div className="flex items-center gap-2 mb-1">
+                    <Badge variant="secondary" className="text-xs font-normal">
+                      {product.associateCount && product.associateCount > 0 
+                        ? `${product.associateCount} ${product.associateCount === 1 ? 'produtor' : 'produtores'}`
+                        : 'Disponível'}
+                    </Badge>
                   </div>
                   <CardTitle className="text-xl">{product.name}</CardTitle>
                 </CardHeader>
@@ -146,7 +138,7 @@ export default function ProductsClientPage({ initialProducts, categories }: Prod
               </Card>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
 
         {filteredProducts.length === 0 && (
           <div className="text-center py-20">

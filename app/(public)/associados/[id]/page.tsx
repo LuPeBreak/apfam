@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, MapPin, ShoppingBag } from "lucide-react";
+import { ArrowLeft, MapPin, ShoppingBag, Check } from "lucide-react";
 
 export const dynamic = 'force-dynamic';
 
@@ -53,8 +53,12 @@ export default async function AssociatePage({ params }: AssociatePageProps) {
           className="object-cover -z-10"
           priority
         />
-        <div className="container h-full flex items-start pt-8 px-4">
-          <Button variant="ghost" asChild className="text-white hover:bg-white/20 hover:text-white pl-0">
+        <div className="container h-full flex items-start pt-8 px-4 relative z-20">
+          <Button 
+            variant="secondary" 
+            asChild 
+            className="bg-white/90 hover:bg-white text-primary shadow-sm backdrop-blur-sm"
+          >
             <Link href="/associados" className="flex items-center gap-2">
               <ArrowLeft className="h-4 w-4" />
               Voltar para associados
@@ -89,11 +93,11 @@ export default async function AssociatePage({ params }: AssociatePageProps) {
                     <span className="block text-2xl font-bold text-primary">{products.length}</span>
                     <span className="text-xs text-muted-foreground uppercase tracking-wider">Produtos</span>
                   </div>
-                  <div className="text-center border-l">
-                    <span className="block text-2xl font-bold text-primary">
-                      {new Date(associate.created_at || Date.now()).getFullYear()}
-                    </span>
-                    <span className="text-xs text-muted-foreground uppercase tracking-wider">Membro desde</span>
+                  <div className="text-center border-l flex flex-col items-center justify-center">
+                    <div className="bg-green-100 text-green-700 p-1.5 rounded-full mb-1">
+                      <Check className="h-4 w-4" />
+                    </div>
+                    <span className="text-xs text-muted-foreground uppercase tracking-wider">Produtor Local</span>
                   </div>
                 </div>
               </div>

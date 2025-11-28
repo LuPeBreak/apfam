@@ -41,6 +41,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Combobox } from "@/components/custom/combobox";
 import { AssociateForm, AssociateFormData } from "@/components/admin/forms/AssociateForm";
 import { toast } from "sonner";
 
@@ -215,23 +216,14 @@ export function AssociatesTable({ initialData, catalog }: AssociatesTableProps) 
         searchPlaceholder="Buscar associados..."
         filterSlot={
           <div className="flex items-center gap-2">
-            <div className="w-[200px]">
-              <Select
-                value={selectedProductFilter}
-                onValueChange={setSelectedProductFilter}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Filtrar por produto" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos os produtos</SelectItem>
-                  {catalog.map((product) => (
-                    <SelectItem key={product.id} value={product.id}>
-                      {product.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="w-[250px]">
+              <Combobox
+                options={catalog.map(p => ({ label: p.name, value: p.id }))}
+                value={selectedProductFilter === "all" ? "" : selectedProductFilter}
+                onChange={(val) => setSelectedProductFilter(val || "all")}
+                placeholder="Filtrar por produto"
+                searchPlaceholder="Buscar produto..."
+              />
             </div>
             {selectedProductFilter !== "all" && (
               <Button 
