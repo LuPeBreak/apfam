@@ -1,5 +1,5 @@
 
-import { EventsTable } from "@/components/admin/tables/EventsTable";
+import { EventsTable } from "@/components/tables/EventsTable";
 import { supabase } from "@/lib/supabase";
 import { Event } from "@/types";
 

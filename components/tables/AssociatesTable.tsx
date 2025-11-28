@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Product, Category } from "@/types";
+import { Associate, Product } from "@/types";
 import { DataTable } from "@/components/tables/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
@@ -41,20 +41,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Combobox } from "@/components/custom/combobox";
-import { ProductForm, ProductFormData } from "@/components/admin/forms/ProductForm";
+import { Combobox } from "@/components/combobox";
+import { AssociateForm, AssociateFormData } from "@/components/admin/forms/AssociateForm";
 import { toast } from "sonner";
 
-interface ProductsTableProps {
-  initialData: Product[];
-  categories: Category[];
+interface AssociatesTableProps {
+  initialData: Associate[];
+  catalog: Product[];
 }
 
-export function ProductsTable({ initialData, categories }: ProductsTableProps) {
-  const [data, setData] = useState<Product[]>(initialData);
+export function AssociatesTable({ initialData, catalog }: AssociatesTableProps) {
+  const [data, setData] = useState<Associate[]>(initialData);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>("all");
+  const [selectedProductFilter, setSelectedProductFilter] = useState<string>("all");
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const router = useRouter();
 
@@ -62,8 +62,8 @@ export function ProductsTable({ initialData, categories }: ProductsTableProps) {
     setData(initialData);
   }, [initialData]);
 
-  const handleEdit = (product: Product) => {
-    setEditingId(product.id);
+  const handleEdit = (associate: Associate) => {
+    setEditingId(associate.id);
     setIsDialogOpen(true);
   };
 
@@ -73,96 +73,102 @@ export function ProductsTable({ initialData, categories }: ProductsTableProps) {
 
   const handleDelete = async () => {
     if (!deleteId) return;
-
-    const { error } = await supabase.from("products").delete().eq("id", deleteId);
+    
+    const { error } = await supabase.from("associates").delete().eq("id", deleteId);
     if (error) {
-      toast.error("Erro ao excluir produto");
+      toast.error("Erro ao excluir associado");
       console.error(error);
     } else {
       setData(data.filter((item) => item.id !== deleteId));
-      toast.success("Produto excluído com sucesso");
+      toast.success("Associado excluído com sucesso");
       router.refresh();
     }
     setDeleteId(null);
   };
 
-  const handleSubmit = async (formData: ProductFormData) => {
+  const handleSubmit = async (formData: AssociateFormData) => {
     try {
-      let productId = editingId;
+      let associateId = editingId;
 
       if (editingId) {
-        // Update product
+        // Update associate
         const { error } = await supabase
-          .from("products")
+          .from("associates")
           .update({
             name: formData.name,
-            description: formData.description,
-            image_url: formData.imageUrl,
+            bio: formData.bio,
+            location: formData.location,
+            avatar_url: formData.avatarUrl,
           })
           .eq("id", editingId);
         if (error) throw error;
       } else {
-        // Create product
-        const { data: newProduct, error } = await supabase
-          .from("products")
+        // Create associate
+        const { data: newAssociate, error } = await supabase
+          .from("associates")
           .insert([{
             name: formData.name,
-            description: formData.description,
-            image_url: formData.imageUrl || "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&q=80",
+            bio: formData.bio,
+            location: formData.location,
+            avatar_url: formData.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${formData.name}`,
           }])
           .select()
           .single();
         if (error) throw error;
-        productId = newProduct.id;
+        associateId = newAssociate.id;
       }
 
-      if (productId) {
-        // Manage categories
+      if (associateId) {
+        // Manage products
         // First delete existing associations if updating
         if (editingId) {
-           await supabase.from("product_categories").delete().eq("product_id", productId);
+           await supabase.from("associate_products").delete().eq("associate_id", associateId);
         }
 
         // Insert new associations
-        if (formData.categoryIds && formData.categoryIds.length > 0) {
-          const categoryInserts = formData.categoryIds.map(catId => ({
-            product_id: productId,
-            category_id: catId
+        if (formData.productIds && formData.productIds.length > 0) {
+          const productInserts = formData.productIds.map(prodId => ({
+            associate_id: associateId,
+            product_id: prodId
           }));
-          const { error: catError } = await supabase.from("product_categories").insert(categoryInserts);
-          if (catError) throw catError;
+          const { error: prodError } = await supabase.from("associate_products").insert(productInserts);
+          if (prodError) throw prodError;
         }
       }
 
       setIsDialogOpen(false);
       setEditingId(null);
-      toast.success(editingId ? "Produto atualizado com sucesso" : "Produto criado com sucesso");
+      toast.success(editingId ? "Associado atualizado com sucesso" : "Associado criado com sucesso");
       router.refresh();
     } catch (error) {
-      console.error("Error saving product:", error);
-      toast.error("Erro ao salvar produto");
+      console.error("Error saving associate:", error);
+      toast.error("Erro ao salvar associado");
     }
   };
 
-  const filteredData = selectedCategoryFilter === "all"
+  const filteredData = selectedProductFilter === "all"
     ? data
-    : data.filter(product => product.categoryIds?.includes(selectedCategoryFilter));
+    : data.filter(associate => associate.products.some(p => p.id === selectedProductFilter));
 
-  const columns: ColumnDef<Product>[] = [
+  const columns: ColumnDef<Associate>[] = [
     {
       accessorKey: "name",
       header: "Nome",
     },
     {
-      accessorKey: "categoryNames",
-      header: "Categorias",
+      accessorKey: "location",
+      header: "Localização",
+    },
+    {
+      accessorKey: "products",
+      header: "Produtos",
       cell: ({ row }) => {
-        const names = row.original.categoryNames || [];
+        const products = row.original.products;
         return (
           <div className="flex flex-wrap gap-1">
-            {names.map((name, i) => (
-              <span key={i} className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                {name}
+            {products.map((p) => (
+              <span key={p.id} className="text-xs bg-muted px-1.5 py-0.5 rounded-full">
+                {p.name}
               </span>
             ))}
           </div>
@@ -170,14 +176,9 @@ export function ProductsTable({ initialData, categories }: ProductsTableProps) {
       },
     },
     {
-      accessorKey: "description",
-      header: "Descrição",
-      cell: ({ row }) => <div className="max-w-[300px] truncate">{row.getValue("description")}</div>,
-    },
-    {
       id: "actions",
       cell: ({ row }) => {
-        const product = row.original;
+        const associate = row.original;
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -188,13 +189,13 @@ export function ProductsTable({ initialData, categories }: ProductsTableProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Ações</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => handleEdit(product)}>
+              <DropdownMenuItem onClick={() => handleEdit(associate)}>
                 <Edit className="mr-2 h-4 w-4" />
                 Editar
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
-                onClick={() => confirmDelete(product.id)}
+                onClick={() => confirmDelete(associate.id)}
                 className="text-destructive focus:text-destructive"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
@@ -212,23 +213,23 @@ export function ProductsTable({ initialData, categories }: ProductsTableProps) {
       <DataTable 
         columns={columns} 
         data={filteredData} 
-        searchPlaceholder="Buscar produtos..."
+        searchPlaceholder="Buscar associados..."
         filterSlot={
           <div className="flex items-center gap-2">
             <div className="w-[250px]">
               <Combobox
-                options={categories.map(c => ({ label: c.name, value: c.id }))}
-                value={selectedCategoryFilter === "all" ? "" : selectedCategoryFilter}
-                onChange={(val) => setSelectedCategoryFilter(val || "all")}
-                placeholder="Filtrar por categoria"
-                searchPlaceholder="Buscar categoria..."
+                options={catalog.map(p => ({ label: p.name, value: p.id }))}
+                value={selectedProductFilter === "all" ? "" : selectedProductFilter}
+                onChange={(val) => setSelectedProductFilter(val || "all")}
+                placeholder="Filtrar por produto"
+                searchPlaceholder="Buscar produto..."
               />
             </div>
-            {selectedCategoryFilter !== "all" && (
+            {selectedProductFilter !== "all" && (
               <Button 
                 variant="ghost" 
                 size="icon" 
-                onClick={() => setSelectedCategoryFilter("all")}
+                onClick={() => setSelectedProductFilter("all")}
                 title="Limpar filtro"
               >
                 <Trash2 className="h-4 w-4 text-muted-foreground" />
@@ -243,20 +244,20 @@ export function ProductsTable({ initialData, categories }: ProductsTableProps) {
           }}>
             <DialogTrigger asChild>
               <Button>
-                <Plus className="h-4 w-4 mr-2" /> Novo Produto
+                <Plus className="h-4 w-4 mr-2" /> Novo Associado
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px]">
+            <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>{editingId ? "Editar Produto" : "Adicionar Produto"}</DialogTitle>
+                <DialogTitle>{editingId ? "Editar Associado" : "Adicionar Associado"}</DialogTitle>
                 <DialogDescription>
-                  Cadastre um novo produto no catálogo.
+                  Preencha os dados e selecione os produtos.
                 </DialogDescription>
               </DialogHeader>
-              <ProductForm 
+              <AssociateForm 
                 onSubmit={handleSubmit} 
-                categories={categories}
-                initialData={editingId ? data.find(p => p.id === editingId) : undefined}
+                catalog={catalog} 
+                initialData={editingId ? data.find(a => a.id === editingId) : undefined}
               />
             </DialogContent>
           </Dialog>
@@ -268,7 +269,7 @@ export function ProductsTable({ initialData, categories }: ProductsTableProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Tem certeza absoluta?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta ação não pode ser desfeita. Isso excluirá permanentemente o produto
+              Esta ação não pode ser desfeita. Isso excluirá permanentemente o associado
               e removerá seus dados de nossos servidores.
             </AlertDialogDescription>
           </AlertDialogHeader>

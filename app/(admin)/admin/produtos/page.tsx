@@ -1,4 +1,4 @@
-import { ProductsTable } from "@/components/admin/tables/ProductsTable";
+import { ProductsTable } from "@/components/tables/ProductsTable";
 import { supabase } from "@/lib/supabase";
 import { Product, Category } from "@/types";
 

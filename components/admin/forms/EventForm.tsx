@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ImageUpload } from "@/components/custom/image-upload";
+import { ImageUpload } from "@/components/image-upload";
 import { useEffect } from "react";
 
 export const eventSchema = z.object({

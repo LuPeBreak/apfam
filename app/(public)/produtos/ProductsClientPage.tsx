@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { MultiSelect } from "@/components/custom/multi-select";
+import { MultiSelect } from "@/components/multi-select";
 import { Search, ShoppingBag, MessageCircle } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";

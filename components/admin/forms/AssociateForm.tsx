@@ -14,8 +14,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { MultiSelect } from "@/components/custom/multi-select";
-import { ImageUpload } from "@/components/custom/image-upload";
+import { MultiSelect } from "@/components/multi-select";
+import { ImageUpload } from "@/components/image-upload";
 import { Product, Associate } from "@/types";
 import { useEffect } from "react";
 

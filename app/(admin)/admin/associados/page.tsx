@@ -1,4 +1,4 @@
-import { AssociatesTable } from "@/components/admin/tables/AssociatesTable";
+import { AssociatesTable } from "@/components/tables/AssociatesTable";
 import { supabase } from "@/lib/supabase";
 import { Associate, Product } from "@/types";
 

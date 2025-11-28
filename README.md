@@ -1,36 +1,121 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# APFAM - Associação dos Produtores Familiares
 
-## Getting Started
+Bem-vindo ao repositório oficial da plataforma web da APFAM. Este projeto visa conectar produtores familiares locais diretamente aos consumidores, promovendo a agricultura sustentável e o comércio justo.
 
-First, run the development server:
+> [!IMPORTANT]
+> **Este projeto foi desenvolvido integralmente pela Antigravity AI**, como parte de um teste técnico das capacidades de desenvolvimento de software assistido por inteligência artificial, sob supervisão e fiscalização humana.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 Sobre o Projeto
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+A plataforma APFAM é uma solução moderna e responsiva que permite:
+-   **Consumidores**: Navegar por um catálogo de produtos frescos, encontrar produtores locais, visualizar eventos e entrar em contato direto.
+-   **Produtores**: Terem seus perfis e produtos divulgados de forma profissional.
+-   **Administradores**: Gerenciar todo o conteúdo do site (associados, produtos, eventos, categorias) através de um painel administrativo seguro.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ✨ Funcionalidades
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Área Pública
+-   **Home Page**: Destaques de produtos, eventos e associados com design premium.
+-   **Catálogo de Produtos**: Busca avançada por nome e filtros por categoria. Visualização de detalhes e contagem de produtores.
+-   **Perfil dos Associados**: Página detalhada com biografia, localização e lista de produtos do produtor.
+-   **Agenda de Eventos**: Listagem de feiras e reuniões com busca integrada.
+-   **Contato**: Formulário de contato direto com a associação.
 
-## Learn More
+### Painel Administrativo
+-   **Dashboard**: Visão geral do sistema.
+-   **Gestão de Associados**: Cadastro completo com upload de fotos.
+-   **Gestão de Produtos**: Controle de catálogo com imagens e categorias.
+-   **Gestão de Eventos**: Divulgação de datas e locais.
+-   **Filtros Avançados**: Tabelas com busca inteligente para facilitar a gestão.
 
-To learn more about Next.js, take a look at the following resources:
+## 🛠️ Tecnologias Utilizadas
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+O projeto foi construído com as tecnologias mais recentes do ecossistema React/Next.js:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+-   **Framework**: [Next.js 15](https://nextjs.org/) (App Router)
+-   **Linguagem**: [TypeScript](https://www.typescriptlang.org/)
+-   **Estilização**: [Tailwind CSS](https://tailwindcss.com/)
+-   **Componentes UI**: [shadcn/ui](https://ui.shadcn.com/)
+-   **Ícones**: [Lucide React](https://lucide.dev/)
+-   **Animações**: [Framer Motion](https://www.framer.com/motion/)
+-   **Banco de Dados & Auth**: [Supabase](https://supabase.com/)
+-   **Formulários**: React Hook Form + Zod
 
-## Deploy on Vercel
+## 🏁 Como Executar o Projeto
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Siga os passos abaixo para rodar o projeto em seu ambiente local.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Pré-requisitos
+-   Node.js 18+ instalado.
+-   Gerenciador de pacotes (npm, yarn ou pnpm).
+
+### Instalação
+
+1.  Clone o repositório:
+    ```bash
+    git clone https://github.com/seu-usuario/apfam-antigravity.git
+    cd apfam-antigravity
+    ```
+
+2.  Instale as dependências:
+    ```bash
+    npm install
+    ```
+
+3.  Configure as Variáveis de Ambiente:
+    Crie um arquivo `.env.local` na raiz do projeto e preencha com suas credenciais do Supabase e configurações de contato:
+
+    ```env
+    # Supabase
+    NEXT_PUBLIC_SUPABASE_URL=sua_url_do_supabase
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anonima_do_supabase
+
+    # Configurações de Contato (Exibição)
+    NEXT_PUBLIC_CONTACT_EMAIL=contato@apfam.com.br
+    NEXT_PUBLIC_CONTACT_PHONE=5524999999999
+    NEXT_PUBLIC_CONTACT_WHATSAPP=5524999999999
+    NEXT_PUBLIC_CONTACT_ADDRESS="Rua Exemplo, 123 - Centro, Cidade - RJ"
+
+    # Configurações de Envio de Email (Opcional - para formulário funcionar)
+    EMAIL_HOST=smtp.exemplo.com
+    EMAIL_PORT=587
+    EMAIL_USER=seu_usuario_smtp
+    EMAIL_PASS=sua_senha_smtp
+    EMAIL_FROM=noreply@apfam.com.br
+    ```
+
+4.  Execute o servidor de desenvolvimento:
+    ```bash
+    npm run dev
+    ```
+
+5.  Acesse `http://localhost:3000` no seu navegador.
+
+## 🗄️ Estrutura do Banco de Dados (Supabase)
+
+O projeto requer as seguintes tabelas no Supabase:
+
+-   `associates`: Armazena dados dos produtores.
+-   `categories`: Categorias de produtos.
+-   `products`: Catálogo de produtos.
+-   `events`: Agenda de eventos.
+-   `associate_products`: Tabela pivô (N:N) ligando produtores a produtos.
+-   `product_categories`: Tabela pivô (N:N) ligando produtos a categorias.
+
+**Storage**: É necessário um bucket público chamado `images` para upload de fotos.
+
+## 📂 Estrutura de Pastas
+
+-   `app/`: Rotas e páginas do Next.js (App Router).
+    -   `(admin)/`: Rotas protegidas do painel administrativo.
+    -   `(public)/`: Rotas públicas do site.
+-   `components/`: Componentes React reutilizáveis.
+    -   `ui/`: Componentes base do shadcn/ui.
+    -   `custom/`: Componentes personalizados (ImageUpload, MultiSelect, etc).
+    -   `admin/`: Componentes específicos da área administrativa.
+-   `lib/`: Utilitários e configurações (cliente Supabase, utils).
+-   `types/`: Definições de tipos TypeScript.
+
+---
+
+Desenvolvido com 💚 para a APFAM.

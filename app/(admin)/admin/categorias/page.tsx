@@ -1,4 +1,4 @@
-import { CategoriesTable } from "@/components/admin/tables/CategoriesTable";
+import { CategoriesTable } from "@/components/tables/CategoriesTable";
 import { supabase } from "@/lib/supabase";
 import { Category } from "@/types";
 
