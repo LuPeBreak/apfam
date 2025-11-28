@@ -1,7 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MOCK_ASSOCIATES, MOCK_EVENTS, MOCK_CATALOG, MOCK_CATEGORIES } from "@/data/mocks";
+import { supabase } from "@/lib/supabase";
 
-export default function AdminDashboardPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function AdminDashboardPage() {
+  const { count: associatesCount } = await supabase.from('associates').select('*', { count: 'exact', head: true });
+  const { count: eventsCount } = await supabase.from('events').select('*', { count: 'exact', head: true });
+  const { count: productsCount } = await supabase.from('products').select('*', { count: 'exact', head: true });
+  const { count: categoriesCount } = await supabase.from('categories').select('*', { count: 'exact', head: true });
+
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
@@ -19,7 +26,7 @@ export default function AdminDashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold">{MOCK_ASSOCIATES.length}</div>
+            <div className="text-4xl font-bold">{associatesCount || 0}</div>
           </CardContent>
         </Card>
         <Card>
@@ -29,7 +36,7 @@ export default function AdminDashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold">{MOCK_EVENTS.length}</div>
+            <div className="text-4xl font-bold">{eventsCount || 0}</div>
           </CardContent>
         </Card>
         <Card>
@@ -39,7 +46,7 @@ export default function AdminDashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold">{MOCK_CATALOG.length}</div>
+            <div className="text-4xl font-bold">{productsCount || 0}</div>
           </CardContent>
         </Card>
         <Card>
@@ -49,7 +56,7 @@ export default function AdminDashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold">{MOCK_CATEGORIES.length}</div>
+            <div className="text-4xl font-bold">{categoriesCount || 0}</div>
           </CardContent>
         </Card>
       </div>

@@ -1,0 +1,107 @@
+"use client";
+
+import { useState } from "react";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { MapPin, Search } from "lucide-react";
+import Image from "next/image";
+import { Associate } from "@/types";
+
+interface AssociatesClientPageProps {
+  initialAssociates: Associate[];
+}
+
+export default function AssociatesClientPage({ initialAssociates }: AssociatesClientPageProps) {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredAssociates = initialAssociates.filter((associate) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      associate.name.toLowerCase().includes(searchLower) ||
+      associate.products.some((p) => p.name.toLowerCase().includes(searchLower)) ||
+      associate.location?.toLowerCase().includes(searchLower)
+    );
+  });
+
+  return (
+    <div className="container py-12 px-4 min-h-screen">
+      <div className="max-w-6xl mx-auto space-y-8">
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl font-bold text-primary">Nossos Associados</h1>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            Conheça as famílias e produtores que fazem parte da nossa história.
+          </p>
+        </div>
+
+        {/* Search */}
+        <div className="max-w-md mx-auto relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por nome, produto ou local..."
+            className="pl-10"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        {/* Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredAssociates.map((associate) => (
+            <Card key={associate.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 group border-none shadow-md">
+              <div className="relative h-48 w-full overflow-hidden">
+                <Image
+                  src={associate.avatarUrl || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80"}
+                  alt={associate.name}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+              </div>
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <div>
+                    <CardTitle className="text-xl mb-1">{associate.name}</CardTitle>
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <MapPin className="h-3 w-3 mr-1" />
+                      {associate.location}
+                    </div>
+                  </div>
+                  
+                  <p className="text-sm text-muted-foreground line-clamp-3">
+                    {associate.bio}
+                  </p>
+
+                  <div>
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">
+                      Principais Produtos
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {associate.products.slice(0, 3).map((product) => (
+                        <span 
+                          key={product.id}
+                          className="inline-flex items-center px-2 py-1 rounded-md bg-secondary/50 text-secondary-foreground text-xs"
+                        >
+                          {product.name}
+                        </span>
+                      ))}
+                      {associate.products.length > 3 && (
+                        <span className="text-xs text-muted-foreground self-center">
+                          +{associate.products.length - 3}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {filteredAssociates.length === 0 && (
+          <div className="text-center py-12 text-muted-foreground">
+            Nenhum associado encontrado para &quot;{searchTerm}&quot;.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

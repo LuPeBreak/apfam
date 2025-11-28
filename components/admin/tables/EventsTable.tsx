@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { Event } from "@/types";
-import { DataTable } from "@/components/ui/data-table";
+import { DataTable } from "@/components/tables/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Edit, Plus, Trash2, MoreHorizontal } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import {
   Dialog,
   DialogContent,
@@ -15,6 +17,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -22,7 +34,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { EventForm } from "@/components/admin/forms/EventForm";
+import { EventForm, EventFormData } from "@/components/admin/forms/EventForm";
+import { toast } from "sonner";
 
 interface EventsTableProps {
   initialData: Event[];
@@ -32,6 +45,83 @@ export function EventsTable({ initialData }: EventsTableProps) {
   const [data, setData] = useState<Event[]>(initialData);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleEdit = (event: Event) => {
+    setEditingId(event.id);
+    setIsDialogOpen(true);
+  };
+
+  const confirmDelete = (id: string) => {
+    setDeleteId(id);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+
+    const { error } = await supabase.from("events").delete().eq("id", deleteId);
+    if (error) {
+      toast.error("Erro ao excluir evento");
+      console.error(error);
+    } else {
+      setData(data.filter((item) => item.id !== deleteId));
+      toast.success("Evento excluído com sucesso");
+      router.refresh();
+    }
+    setDeleteId(null);
+  };
+
+  const handleSubmit = async (formData: EventFormData) => {
+    try {
+      if (editingId) {
+        // Update event
+        const { error } = await supabase
+          .from("events")
+          .update({
+            title: formData.title,
+            date: formData.date,
+            location: formData.location,
+            description: formData.description,
+            image_url: formData.imageUrl,
+          })
+          .eq("id", editingId);
+        if (error) throw error;
+        setData(data.map((item) => (item.id === editingId ? { ...item, ...formData, imageUrl: formData.imageUrl } : item)));
+      } else {
+        // Create event
+        const { data: newEvent, error } = await supabase
+          .from("events")
+          .insert([{
+            title: formData.title,
+            date: formData.date,
+            location: formData.location,
+            description: formData.description,
+            image_url: formData.imageUrl || "https://images.unsplash.com/photo-1531058020387-3be344556be6?w=800&q=80",
+          }])
+          .select()
+          .single();
+        if (error) throw error;
+        if (newEvent) {
+            setData([...data, {
+                id: newEvent.id,
+                title: newEvent.title,
+                date: newEvent.date,
+                location: newEvent.location,
+                description: newEvent.description,
+                imageUrl: newEvent.image_url
+            }]);
+        }
+      }
+      setIsDialogOpen(false);
+      setEditingId(null);
+      toast.success(editingId ? "Evento atualizado com sucesso" : "Evento criado com sucesso");
+      router.refresh();
+    } catch (error) {
+      console.error("Error saving event:", error);
+      toast.error("Erro ao salvar evento");
+    }
+  };
 
   const columns: ColumnDef<Event>[] = [
     {
@@ -69,7 +159,7 @@ export function EventsTable({ initialData }: EventsTableProps) {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
-                onClick={() => handleDelete(event.id)}
+                onClick={() => confirmDelete(event.id)}
                 className="text-destructive focus:text-destructive"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
@@ -81,36 +171,6 @@ export function EventsTable({ initialData }: EventsTableProps) {
       },
     },
   ];
-
-  const handleEdit = (event: Event) => {
-    setEditingId(event.id);
-    setIsDialogOpen(true);
-  };
-
-  const handleDelete = (id: string) => {
-    if (confirm("Tem certeza que deseja excluir este evento?")) {
-      setData(data.filter((item) => item.id !== id));
-    }
-  };
-
-  const handleSubmit = (formData: any) => {
-    if (editingId) {
-      setData(data.map(item => item.id === editingId ? {
-        ...item,
-        ...formData,
-        id: editingId
-      } : item));
-    } else {
-      const newEvent: Event = {
-        id: Date.now().toString(),
-        ...formData,
-        imageUrl: "https://images.unsplash.com/photo-1506617420156-8e4536971650?w=800&q=80",
-      };
-      setData([...data, newEvent]);
-    }
-    setIsDialogOpen(false);
-    setEditingId(null);
-  };
 
   return (
     <div className="space-y-4">
@@ -140,6 +200,24 @@ export function EventsTable({ initialData }: EventsTableProps) {
       </div>
 
       <DataTable columns={columns} data={data} searchPlaceholder="Buscar eventos..." />
+
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Tem certeza absoluta?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. Isso excluirá permanentemente o evento
+              e removerá seus dados de nossos servidores.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

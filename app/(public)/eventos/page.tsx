@@ -1,13 +1,32 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MOCK_EVENTS } from "@/data/mocks";
 import { Calendar, MapPin } from "lucide-react";
 import Image from "next/image";
+import { supabase } from "@/lib/supabase";
+import { Event } from "@/types";
 
-export default function EventsPage() {
-  // Sort events by date (ascending - upcoming first)
-  const sortedEvents = [...MOCK_EVENTS].sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
+export const dynamic = 'force-dynamic';
+
+export default async function EventsPage() {
+  const { data: events, error } = await supabase
+    .from('events')
+    .select('*')
+    .order('date', { ascending: true });
+
+  if (error) {
+    console.error("Error fetching events:", error);
+  }
+
+  // Filter for upcoming events (optional, or just show all sorted)
+  // For now, let's show all, or we could filter in SQL: .gte('date', new Date().toISOString())
+  
+  const formattedEvents: Event[] = (events || []).map((e: any) => ({
+    id: e.id,
+    title: e.title,
+    date: e.date,
+    location: e.location || "",
+    description: e.description || "",
+    imageUrl: e.image_url,
+  }));
 
   return (
     <div className="container py-12 px-4 min-h-screen">
@@ -20,7 +39,7 @@ export default function EventsPage() {
         </div>
 
         <div className="grid gap-8">
-          {sortedEvents.map((event) => (
+          {formattedEvents.map((event) => (
             <Card key={event.id} className="overflow-hidden hover:shadow-md transition-shadow">
               <div className="flex flex-col md:flex-row">
                 <div className="relative h-48 md:h-auto md:w-1/3 shrink-0">
@@ -59,6 +78,12 @@ export default function EventsPage() {
               </div>
             </Card>
           ))}
+          
+          {formattedEvents.length === 0 && (
+            <div className="text-center py-12 text-muted-foreground">
+              Nenhum evento agendado no momento.
+            </div>
+          )}
         </div>
       </div>
     </div>

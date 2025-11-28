@@ -1,4 +1,5 @@
 import { Facebook, Instagram, Mail, MapPin, Phone } from "lucide-react";
+import { siteConfig, formatPhoneNumber } from "@/lib/config";
 
 export function Footer() {
   return (
@@ -18,18 +19,18 @@ export function Footer() {
             <li className="flex items-start gap-2">
               <MapPin className="h-5 w-5 shrink-0 text-primary" />
               <span>
-                Estrada da Granja n 40, Santa Rita de Cássia
-                <br />
-                Barra Mansa/RJ - CEP 27322-410
+                {siteConfig.contact.address}
               </span>
             </li>
             <li className="flex items-center gap-2">
               <Phone className="h-5 w-5 shrink-0 text-primary" />
-              <span>24 3341-5591 / 24 99819-8120</span>
+              <span>
+                {formatPhoneNumber(siteConfig.contact.phone)} / {formatPhoneNumber(siteConfig.contact.whatsapp)}
+              </span>
             </li>
             <li className="flex items-center gap-2">
               <Mail className="h-5 w-5 shrink-0 text-primary" />
-              <span>adilsonrezende@uol.com.br</span>
+              <span>{siteConfig.contact.email}</span>
             </li>
           </ul>
         </div>

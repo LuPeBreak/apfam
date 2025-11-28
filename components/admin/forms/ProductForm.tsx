@@ -13,7 +13,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { MultiSelect } from "@/components/ui/multi-select";
+import { MultiSelect } from "@/components/custom/multi-select";
+import { ImageUpload } from "@/components/custom/image-upload";
 import { Category, Product } from "@/types";
 import { useEffect } from "react";
 
@@ -21,6 +22,7 @@ export const productSchema = z.object({
   name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres."),
   categoryIds: z.array(z.string()).min(1, "Selecione pelo menos uma categoria."),
   description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
+  imageUrl: z.string().optional(),
 });
 
 export type ProductFormData = z.infer<typeof productSchema>;
@@ -38,6 +40,7 @@ export function ProductForm({ onSubmit, initialData, categories }: ProductFormPr
       name: "",
       categoryIds: [],
       description: "",
+      imageUrl: "",
     },
   });
 
@@ -45,8 +48,9 @@ export function ProductForm({ onSubmit, initialData, categories }: ProductFormPr
     if (initialData) {
       form.reset({
         name: initialData.name,
-        categoryIds: initialData.categoryIds || (initialData.categoryId ? [initialData.categoryId] : []),
+        categoryIds: initialData.categoryIds || [],
         description: initialData.description,
+        imageUrl: initialData.imageUrl || "",
       });
     }
   }, [initialData, form]);
@@ -98,10 +102,22 @@ export function ProductForm({ onSubmit, initialData, categories }: ProductFormPr
             </FormItem>
           )}
         />
-        <div className="space-y-2">
-          <FormLabel>Imagem</FormLabel>
-          <Input type="file" accept="image/*" />
-        </div>
+        <FormField
+          control={form.control}
+          name="imageUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Imagem do Produto</FormLabel>
+              <FormControl>
+                <ImageUpload
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <div className="flex justify-end">
           <Button type="submit">{initialData ? "Atualizar" : "Salvar"} Produto</Button>
         </div>

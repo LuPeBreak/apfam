@@ -13,6 +13,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "api.dicebear.com",
       },
+      {
+        protocol: "https",
+        hostname: "wallpapers.com",
+      },
+      {
+        protocol: "https",
+        hostname: "bmoghybiddxohxacuotp.supabase.co",
+      },
     ],
   },
   typescript: {

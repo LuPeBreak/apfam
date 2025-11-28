@@ -1,13 +1,9 @@
-import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import LoginForm from './LoginForm'
 
-export default async function AdminLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default async function LoginPage() {
   const cookieStore = await cookies()
 
   const supabase = createServerClient(
@@ -35,20 +31,9 @@ export default async function AdminLayout({
 
   const { data: { session } } = await supabase.auth.getSession()
 
-  if (!session) {
-    redirect('/login')
+  if (session) {
+    redirect('/admin')
   }
 
-  return (
-    <div className="flex min-h-screen">
-      <aside className="w-64 hidden md:block fixed inset-y-0 z-50">
-        <AdminSidebar />
-      </aside>
-      <main className="flex-1 md:pl-64">
-        <div className="container py-6 px-4 md:px-8">
-          {children}
-        </div>
-      </main>
-    </div>
-  );
+  return <LoginForm />
 }

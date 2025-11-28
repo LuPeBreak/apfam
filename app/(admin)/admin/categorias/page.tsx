@@ -1,16 +1,33 @@
-import { MOCK_CATEGORIES } from "@/data/mocks";
 import { CategoriesTable } from "@/components/admin/tables/CategoriesTable";
+import { supabase } from "@/lib/supabase";
+import { Category } from "@/types";
 
-export default function AdminCategoriesPage() {
-  const categories = MOCK_CATEGORIES;
+export const dynamic = 'force-dynamic';
+
+export default async function CategoriesPage() {
+  const { data: categories, error } = await supabase
+    .from('categories')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error("Error fetching categories:", error);
+    // Handle error appropriately, maybe show an error message component
+  }
+
+  // Cast to Category[] to ensure type compatibility
+  const formattedCategories: Category[] = (categories || []).map((cat: any) => ({
+    id: cat.id,
+    name: cat.name,
+  }));
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-primary">Gerenciar Categorias</h1>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold tracking-tight">Categorias</h1>
       </div>
-
-      <CategoriesTable initialData={categories} />
+      
+      <CategoriesTable initialData={formattedCategories} />
     </div>
   );
 }

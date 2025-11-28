@@ -13,7 +13,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { MultiSelect } from "@/components/ui/multi-select";
+import { MultiSelect } from "@/components/custom/multi-select";
+import { ImageUpload } from "@/components/custom/image-upload";
 import { Product, Associate } from "@/types";
 import { useEffect } from "react";
 
@@ -21,7 +22,8 @@ export const associateSchema = z.object({
   name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres."),
   bio: z.string().min(10, "A biografia deve ter pelo menos 10 caracteres."),
   location: z.string().min(2, "A localização deve ter pelo menos 2 caracteres."),
-  products: z.array(z.string()),
+  productIds: z.array(z.string()),
+  avatarUrl: z.string().optional(),
 });
 
 export type AssociateFormData = z.infer<typeof associateSchema>;
@@ -39,7 +41,8 @@ export function AssociateForm({ onSubmit, initialData, catalog }: AssociateFormP
       name: "",
       bio: "",
       location: "",
-      products: [],
+      productIds: [],
+      avatarUrl: "",
     },
   });
 
@@ -49,7 +52,8 @@ export function AssociateForm({ onSubmit, initialData, catalog }: AssociateFormP
         name: initialData.name,
         bio: initialData.bio,
         location: initialData.location,
-        products: initialData.products.map((p: Product) => p.id),
+        productIds: initialData.products.map((p: Product) => p.id),
+        avatarUrl: initialData.avatarUrl || "",
       });
     }
   }, [initialData, form]);
@@ -98,12 +102,28 @@ export function AssociateForm({ onSubmit, initialData, catalog }: AssociateFormP
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="avatarUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Avatar</FormLabel>
+              <FormControl>
+                <ImageUpload
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         
         <div className="border-t pt-4 mt-4">
           <h4 className="text-sm font-medium mb-2">Produtos Disponíveis</h4>
           <FormField
             control={form.control}
-            name="products"
+            name="productIds"
             render={({ field }) => (
               <FormItem>
                 <FormControl>

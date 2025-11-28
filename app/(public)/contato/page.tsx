@@ -17,6 +17,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Mail, MapPin, Phone } from "lucide-react";
+import { siteConfig, formatPhoneNumber } from "@/lib/config";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
@@ -28,6 +30,7 @@ const formSchema = z.object({
 
 export default function ContactPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -40,13 +43,32 @@ export default function ContactPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Simulate API call
-    console.log(values);
-    setTimeout(() => {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro ao enviar mensagem');
+      }
+
       setIsSubmitted(true);
       form.reset();
-    }, 1000);
+      toast.success("Mensagem enviada com sucesso!");
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.message || "Erro ao enviar mensagem. Tente novamente.");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -67,9 +89,7 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-bold mb-1">Endereço</h3>
                   <p className="text-muted-foreground">
-                    Estrada da Granja n 40, Santa Rita de Cássia
-                    <br />
-                    Barra Mansa/RJ - CEP 27322-410
+                    {siteConfig.contact.address}
                   </p>
                 </div>
               </CardContent>
@@ -79,11 +99,11 @@ export default function ContactPage() {
               <CardContent className="p-6 flex items-start gap-4">
                 <Phone className="h-6 w-6 text-primary shrink-0 mt-1" />
                 <div>
-                  <h3 className="font-bold mb-1">Telefone</h3>
+                  <h3 className="font-bold mb-1">Telefone / WhatsApp</h3>
                   <p className="text-muted-foreground">
-                    24 3341-5591
+                    {formatPhoneNumber(siteConfig.contact.phone)}
                     <br />
-                    24 99819-8120
+                    {formatPhoneNumber(siteConfig.contact.whatsapp)}
                   </p>
                 </div>
               </CardContent>
@@ -95,7 +115,7 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-bold mb-1">Email</h3>
                   <p className="text-muted-foreground">
-                    adilsonrezende@uol.com.br
+                    {siteConfig.contact.email}
                   </p>
                 </div>
               </CardContent>
@@ -194,8 +214,8 @@ export default function ContactPage() {
                         </FormItem>
                       )}
                     />
-                    <Button type="submit" className="w-full">
-                      Enviar Mensagem
+                    <Button type="submit" className="w-full" disabled={isLoading}>
+                      {isLoading ? "Enviando..." : "Enviar Mensagem"}
                     </Button>
                   </form>
                 </Form>

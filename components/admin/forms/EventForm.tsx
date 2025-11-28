@@ -14,38 +14,48 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { ImageUpload } from "@/components/custom/image-upload";
 import { useEffect } from "react";
 
-const eventSchema = z.object({
+export const eventSchema = z.object({
   title: z.string().min(2, "O título deve ter pelo menos 2 caracteres."),
   date: z.string().refine((val) => !isNaN(Date.parse(val)), "Data inválida."),
   location: z.string().min(2, "O local deve ter pelo menos 2 caracteres."),
   description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
+  imageUrl: z.string().optional(),
 });
 
+export type EventFormData = z.infer<typeof eventSchema>;
+
 interface EventFormProps {
-  onSubmit: (data: z.infer<typeof eventSchema>) => void;
+  onSubmit: (data: EventFormData) => void;
   initialData?: any;
 }
 
 export function EventForm({ onSubmit, initialData }: EventFormProps) {
-  const form = useForm<z.infer<typeof eventSchema>>({
-    resolver: zodResolver(eventSchema) as any,
+  const form = useForm<EventFormData>({
+    resolver: zodResolver(eventSchema),
     defaultValues: {
       title: "",
       date: "",
       location: "",
       description: "",
+      imageUrl: "",
     },
   });
 
   useEffect(() => {
     if (initialData) {
+      // Format date for datetime-local input (YYYY-MM-DDThh:mm)
+      const date = new Date(initialData.date);
+      const formattedDate = date.toISOString().slice(0, 16);
+
       form.reset({
         title: initialData.title,
-        date: initialData.date,
+        date: formattedDate,
         location: initialData.location,
         description: initialData.description,
+        imageUrl: initialData.imageUrl || "",
       });
     }
   }, [initialData, form]);
@@ -111,10 +121,22 @@ export function EventForm({ onSubmit, initialData }: EventFormProps) {
             </FormItem>
           )}
         />
-        <div className="space-y-2">
-          <FormLabel>Imagem de Capa</FormLabel>
-          <Input type="file" accept="image/*" />
-        </div>
+        <FormField
+          control={form.control}
+          name="imageUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Imagem do Evento</FormLabel>
+              <FormControl>
+                <ImageUpload
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <div className="flex justify-end">
           <Button type="submit">{initialData ? "Atualizar" : "Salvar"} Evento</Button>
         </div>

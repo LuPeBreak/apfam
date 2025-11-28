@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Product, Category } from "@/types";
-import { DataTable } from "@/components/ui/data-table";
+import { DataTable } from "@/components/tables/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Edit, Plus, Trash2, MoreHorizontal } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +16,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +42,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ProductForm, ProductFormData } from "@/components/admin/forms/ProductForm";
+import { toast } from "sonner";
 
 interface ProductsTableProps {
   initialData: Product[];
@@ -41,6 +54,98 @@ export function ProductsTable({ initialData, categories }: ProductsTableProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>("all");
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    setData(initialData);
+  }, [initialData]);
+
+  const handleEdit = (product: Product) => {
+    setEditingId(product.id);
+    setIsDialogOpen(true);
+  };
+
+  const confirmDelete = (id: string) => {
+    setDeleteId(id);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+
+    const { error } = await supabase.from("products").delete().eq("id", deleteId);
+    if (error) {
+      toast.error("Erro ao excluir produto");
+      console.error(error);
+    } else {
+      setData(data.filter((item) => item.id !== deleteId));
+      toast.success("Produto excluído com sucesso");
+      router.refresh();
+    }
+    setDeleteId(null);
+  };
+
+  const handleSubmit = async (formData: ProductFormData) => {
+    try {
+      let productId = editingId;
+
+      if (editingId) {
+        // Update product
+        const { error } = await supabase
+          .from("products")
+          .update({
+            name: formData.name,
+            description: formData.description,
+            image_url: formData.imageUrl,
+          })
+          .eq("id", editingId);
+        if (error) throw error;
+      } else {
+        // Create product
+        const { data: newProduct, error } = await supabase
+          .from("products")
+          .insert([{
+            name: formData.name,
+            description: formData.description,
+            image_url: formData.imageUrl || "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&q=80",
+          }])
+          .select()
+          .single();
+        if (error) throw error;
+        productId = newProduct.id;
+      }
+
+      if (productId) {
+        // Manage categories
+        // First delete existing associations if updating
+        if (editingId) {
+           await supabase.from("product_categories").delete().eq("product_id", productId);
+        }
+
+        // Insert new associations
+        if (formData.categoryIds && formData.categoryIds.length > 0) {
+          const categoryInserts = formData.categoryIds.map(catId => ({
+            product_id: productId,
+            category_id: catId
+          }));
+          const { error: catError } = await supabase.from("product_categories").insert(categoryInserts);
+          if (catError) throw catError;
+        }
+      }
+
+      setIsDialogOpen(false);
+      setEditingId(null);
+      toast.success(editingId ? "Produto atualizado com sucesso" : "Produto criado com sucesso");
+      router.refresh();
+    } catch (error) {
+      console.error("Error saving product:", error);
+      toast.error("Erro ao salvar produto");
+    }
+  };
+
+  const filteredData = selectedCategoryFilter === "all"
+    ? data
+    : data.filter(product => product.categoryIds?.includes(selectedCategoryFilter));
 
   const columns: ColumnDef<Product>[] = [
     {
@@ -88,7 +193,7 @@ export function ProductsTable({ initialData, categories }: ProductsTableProps) {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
-                onClick={() => handleDelete(product.id)}
+                onClick={() => confirmDelete(product.id)}
                 className="text-destructive focus:text-destructive"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
@@ -100,51 +205,6 @@ export function ProductsTable({ initialData, categories }: ProductsTableProps) {
       },
     },
   ];
-
-  const handleEdit = (product: Product) => {
-    setEditingId(product.id);
-    setIsDialogOpen(true);
-  };
-
-  const handleDelete = (id: string) => {
-    if (confirm("Tem certeza que deseja excluir este produto?")) {
-      setData(data.filter((item) => item.id !== id));
-    }
-  };
-
-
-
-  const handleSubmit = (formData: ProductFormData) => {
-    const selectedCategoryNames = categories
-      .filter(c => formData.categoryIds.includes(c.id))
-      .map(c => c.name);
-
-    if (editingId) {
-      setData(data.map(item => item.id === editingId ? {
-        ...item,
-        ...formData,
-        categoryNames: selectedCategoryNames,
-        id: editingId
-      } : item));
-    } else {
-      const newProduct: Product = {
-        id: Date.now().toString(),
-        name: formData.name,
-        categoryIds: formData.categoryIds,
-        categoryNames: selectedCategoryNames,
-        description: formData.description,
-        imageUrl: "https://images.unsplash.com/photo-1506617420156-8e4536971650?w=800&q=80",
-      };
-      setData([...data, newProduct]);
-    }
-    setIsDialogOpen(false);
-    setEditingId(null);
-  };
-
-  const filteredData = data.filter((product) => {
-    if (selectedCategoryFilter === "all") return true;
-    return product.categoryIds.includes(selectedCategoryFilter);
-  });
 
   return (
     <div className="space-y-4">
@@ -210,6 +270,24 @@ export function ProductsTable({ initialData, categories }: ProductsTableProps) {
           </Dialog>
         }
       />
+
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Tem certeza absoluta?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. Isso excluirá permanentemente o produto
+              e removerá seus dados de nossos servidores.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

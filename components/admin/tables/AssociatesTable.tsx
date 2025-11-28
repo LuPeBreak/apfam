@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Associate, Product } from "@/types";
-import { DataTable } from "@/components/ui/data-table";
+import { DataTable } from "@/components/tables/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Edit, Plus, Trash2, MoreHorizontal } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +16,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +42,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AssociateForm, AssociateFormData } from "@/components/admin/forms/AssociateForm";
+import { toast } from "sonner";
 
 interface AssociatesTableProps {
   initialData: Associate[];
@@ -41,6 +54,100 @@ export function AssociatesTable({ initialData, catalog }: AssociatesTableProps) 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [selectedProductFilter, setSelectedProductFilter] = useState<string>("all");
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    setData(initialData);
+  }, [initialData]);
+
+  const handleEdit = (associate: Associate) => {
+    setEditingId(associate.id);
+    setIsDialogOpen(true);
+  };
+
+  const confirmDelete = (id: string) => {
+    setDeleteId(id);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    
+    const { error } = await supabase.from("associates").delete().eq("id", deleteId);
+    if (error) {
+      toast.error("Erro ao excluir associado");
+      console.error(error);
+    } else {
+      setData(data.filter((item) => item.id !== deleteId));
+      toast.success("Associado excluído com sucesso");
+      router.refresh();
+    }
+    setDeleteId(null);
+  };
+
+  const handleSubmit = async (formData: AssociateFormData) => {
+    try {
+      let associateId = editingId;
+
+      if (editingId) {
+        // Update associate
+        const { error } = await supabase
+          .from("associates")
+          .update({
+            name: formData.name,
+            bio: formData.bio,
+            location: formData.location,
+            avatar_url: formData.avatarUrl,
+          })
+          .eq("id", editingId);
+        if (error) throw error;
+      } else {
+        // Create associate
+        const { data: newAssociate, error } = await supabase
+          .from("associates")
+          .insert([{
+            name: formData.name,
+            bio: formData.bio,
+            location: formData.location,
+            avatar_url: formData.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${formData.name}`,
+          }])
+          .select()
+          .single();
+        if (error) throw error;
+        associateId = newAssociate.id;
+      }
+
+      if (associateId) {
+        // Manage products
+        // First delete existing associations if updating
+        if (editingId) {
+           await supabase.from("associate_products").delete().eq("associate_id", associateId);
+        }
+
+        // Insert new associations
+        if (formData.productIds && formData.productIds.length > 0) {
+          const productInserts = formData.productIds.map(prodId => ({
+            associate_id: associateId,
+            product_id: prodId
+          }));
+          const { error: prodError } = await supabase.from("associate_products").insert(productInserts);
+          if (prodError) throw prodError;
+        }
+      }
+
+      setIsDialogOpen(false);
+      setEditingId(null);
+      toast.success(editingId ? "Associado atualizado com sucesso" : "Associado criado com sucesso");
+      router.refresh();
+    } catch (error) {
+      console.error("Error saving associate:", error);
+      toast.error("Erro ao salvar associado");
+    }
+  };
+
+  const filteredData = selectedProductFilter === "all"
+    ? data
+    : data.filter(associate => associate.products.some(p => p.id === selectedProductFilter));
 
   const columns: ColumnDef<Associate>[] = [
     {
@@ -87,7 +194,7 @@ export function AssociatesTable({ initialData, catalog }: AssociatesTableProps) 
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
-                onClick={() => handleDelete(associate.id)}
+                onClick={() => confirmDelete(associate.id)}
                 className="text-destructive focus:text-destructive"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
@@ -99,49 +206,6 @@ export function AssociatesTable({ initialData, catalog }: AssociatesTableProps) 
       },
     },
   ];
-
-  const handleEdit = (associate: Associate) => {
-    setEditingId(associate.id);
-    setIsDialogOpen(true);
-  };
-
-  const handleDelete = (id: string) => {
-    if (confirm("Tem certeza que deseja excluir este associado?")) {
-      setData(data.filter((item) => item.id !== id));
-    }
-  };
-
-
-
-  const handleSubmit = (formData: AssociateFormData) => {
-    const selectedProducts = catalog.filter(p => formData.products.includes(p.id));
-    
-    if (editingId) {
-      setData(data.map(item => item.id === editingId ? {
-        ...item,
-        ...formData,
-        products: selectedProducts,
-        id: editingId // Keep original ID
-      } : item));
-    } else {
-      const newAssociate: Associate = {
-        id: Date.now().toString(),
-        name: formData.name,
-        bio: formData.bio,
-        location: formData.location,
-        products: selectedProducts,
-        avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=" + Date.now(),
-      };
-      setData([...data, newAssociate]);
-    }
-    setIsDialogOpen(false);
-    setEditingId(null);
-  };
-
-  const filteredData = data.filter((associate) => {
-    if (selectedProductFilter === "all") return true;
-    return associate.products.some((p) => p.id === selectedProductFilter);
-  });
 
   return (
     <div className="space-y-4">
@@ -207,6 +271,24 @@ export function AssociatesTable({ initialData, catalog }: AssociatesTableProps) 
           </Dialog>
         }
       />
+
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Tem certeza absoluta?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. Isso excluirá permanentemente o associado
+              e removerá seus dados de nossos servidores.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

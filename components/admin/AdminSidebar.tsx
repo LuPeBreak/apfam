@@ -1,7 +1,8 @@
+
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -14,6 +15,7 @@ import {
   Sprout
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabase";
 
 const sidebarItems = [
   {
@@ -45,6 +47,13 @@ const sidebarItems = [
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  };
 
   return (
     <div className="flex flex-col h-full border-r bg-muted/10">
@@ -72,21 +81,19 @@ export function AdminSidebar() {
           </Button>
         ))}
       </div>
-      <div className="p-4 border-t bg-muted/20">
-        <div className="flex items-center gap-3 mb-4 px-2">
-          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
-            AD
+      <div className="p-4 border-t border-border">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+            A
           </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-medium">Admin User</span>
-            <span className="text-xs text-muted-foreground">admin@apfam.com</span>
+          <div className="flex-1 overflow-hidden">
+            <p className="text-sm font-medium truncate">Admin</p>
+            <p className="text-xs text-muted-foreground truncate">admin@apfam.com</p>
           </div>
         </div>
-        <Button variant="outline" className="w-full gap-2 text-muted-foreground hover:text-foreground" asChild>
-          <Link href="/">
-            <LogOut className="h-4 w-4" />
-            Sair
-          </Link>
+        <Button variant="outline" className="w-full justify-start text-muted-foreground hover:text-foreground" onClick={handleLogout}>
+          <LogOut className="mr-2 h-4 w-4" />
+          Sair
         </Button>
       </div>
     </div>

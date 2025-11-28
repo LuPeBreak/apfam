@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { Category } from "@/types";
-import { DataTable } from "@/components/ui/data-table";
+import { DataTable } from "@/components/tables/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Edit, Plus, Trash2, MoreHorizontal } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import {
   Dialog,
   DialogContent,
@@ -15,6 +17,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -23,6 +35,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { CategoryForm } from "@/components/admin/forms/CategoryForm";
+import { toast } from "sonner";
 
 interface CategoriesTableProps {
   initialData: Category[];
@@ -32,6 +45,60 @@ export function CategoriesTable({ initialData }: CategoriesTableProps) {
   const [data, setData] = useState<Category[]>(initialData);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleEdit = (category: Category) => {
+    setEditingId(category.id);
+    setIsDialogOpen(true);
+  };
+
+  const confirmDelete = (id: string) => {
+    setDeleteId(id);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+
+    const { error } = await supabase.from("categories").delete().eq("id", deleteId);
+    if (error) {
+      toast.error("Erro ao excluir categoria");
+      console.error(error);
+    } else {
+      setData(data.filter((item) => item.id !== deleteId));
+      toast.success("Categoria excluída com sucesso");
+      router.refresh();
+    }
+    setDeleteId(null);
+  };
+
+  const handleSubmit = async (formData: { name: string }) => {
+    try {
+      if (editingId) {
+        const { error } = await supabase
+          .from("categories")
+          .update({ name: formData.name })
+          .eq("id", editingId);
+        if (error) throw error;
+        setData(data.map((item) => (item.id === editingId ? { ...item, ...formData } : item)));
+      } else {
+        const { data: newCategory, error } = await supabase
+          .from("categories")
+          .insert([{ name: formData.name }])
+          .select()
+          .single();
+        if (error) throw error;
+        if (newCategory) setData([...data, newCategory]);
+      }
+      setIsDialogOpen(false);
+      setEditingId(null);
+      toast.success(editingId ? "Categoria atualizada com sucesso" : "Categoria criada com sucesso");
+      router.refresh();
+    } catch (error) {
+      console.error("Error saving category:", error);
+      toast.error("Erro ao salvar categoria");
+    }
+  };
 
   const columns: ColumnDef<Category>[] = [
     {
@@ -58,7 +125,7 @@ export function CategoriesTable({ initialData }: CategoriesTableProps) {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
-                onClick={() => handleDelete(category.id)}
+                onClick={() => confirmDelete(category.id)}
                 className="text-destructive focus:text-destructive"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
@@ -71,31 +138,6 @@ export function CategoriesTable({ initialData }: CategoriesTableProps) {
     },
   ];
 
-  const handleEdit = (category: Category) => {
-    setEditingId(category.id);
-    setIsDialogOpen(true);
-  };
-
-  const handleDelete = (id: string) => {
-    if (confirm("Tem certeza que deseja excluir esta categoria?")) {
-      setData(data.filter((item) => item.id !== id));
-    }
-  };
-
-  const handleSubmit = (formData: any) => {
-    if (editingId) {
-      setData(data.map(item => item.id === editingId ? { ...item, ...formData } : item));
-    } else {
-      const newCategory: Category = {
-        id: "c" + Date.now().toString(),
-        name: formData.name,
-      };
-      setData([...data, newCategory]);
-    }
-    setIsDialogOpen(false);
-    setEditingId(null);
-  };
-
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
@@ -105,7 +147,7 @@ export function CategoriesTable({ initialData }: CategoriesTableProps) {
         }}>
           <DialogTrigger asChild>
             <Button>
-              <Plus className="h-4 w-4 mr-2" /> Nova Categoria
+              <Plus className="h-4 w-4 mr-2" /> Novo Categoria
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
@@ -124,6 +166,24 @@ export function CategoriesTable({ initialData }: CategoriesTableProps) {
       </div>
 
       <DataTable columns={columns} data={data} searchPlaceholder="Buscar categorias..." />
+
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Tem certeza absoluta?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. Isso excluirá permanentemente a categoria
+              e removerá seus dados de nossos servidores.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
