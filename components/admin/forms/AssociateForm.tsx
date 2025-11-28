@@ -13,6 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { MultiSelect } from "@/components/custom/multi-select";
 import { ImageUpload } from "@/components/custom/image-upload";
 import { Product, Associate } from "@/types";
@@ -96,7 +97,11 @@ export function AssociateForm({ onSubmit, initialData, catalog }: AssociateFormP
             <FormItem>
               <FormLabel>Biografia</FormLabel>
               <FormControl>
-                <Input placeholder="Breve história do produtor" {...field} />
+                <Textarea 
+                  placeholder="História do produtor e detalhes sobre sua produção" 
+                  className="min-h-[100px] resize-none" 
+                  {...field} 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

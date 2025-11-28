@@ -137,51 +137,11 @@ export default function ProductsClientPage({ initialProducts, categories }: Prod
                   </p>
                 </CardContent>
                 <CardFooter className="pt-0">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button className="w-full gap-2 group-hover:bg-primary/90">
-                        <ShoppingBag className="h-4 w-4" />
-                        Tenho Interesse
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
-                      <DialogHeader>
-                      <DialogTitle>Interesse em: {product.name}</DialogTitle>
-                        <DialogDescription>
-                          A APFAM intermedia a venda para garantir a qualidade. Escolha como deseja prosseguir.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="grid gap-4 py-4">
-                        <div className="relative h-40 w-full rounded-md overflow-hidden">
-                          <Image
-                            src={product.imageUrl || ""}
-                            alt={product.name}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          Você será redirecionado para falar com nossa equipe sobre a disponibilidade e entrega deste produto do produtor <strong>{product.associateName}</strong>.
-                        </p>
-                      </div>
-                      <div className="flex flex-col gap-3">
-                        <Button asChild className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white">
-                          <Link 
-                            href={`https://wa.me/${siteConfig.contact.whatsapp}?text=Olá, tenho interesse no produto *${product.name}* do produtor *${product.associateName}* que vi no site da APFAM.`}
-                            target="_blank"
-                          >
-                            <MessageCircle className="h-4 w-4 mr-2" />
-                            Falar no WhatsApp
-                          </Link>
-                        </Button>
-                        <Button variant="outline" asChild className="w-full">
-                          <Link href="/contato">
-                            Enviar Email / Formulário
-                          </Link>
-                        </Button>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
+                  <Button asChild className="w-full group-hover:bg-primary/90">
+                    <Link href={`/produtos/${product.id}`}>
+                      Ver Detalhes
+                    </Link>
+                  </Button>
                 </CardFooter>
               </Card>
             </motion.div>

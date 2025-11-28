@@ -13,6 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { MultiSelect } from "@/components/custom/multi-select";
 import { ImageUpload } from "@/components/custom/image-upload";
 import { Category, Product } from "@/types";
@@ -96,7 +97,11 @@ export function ProductForm({ onSubmit, initialData, categories }: ProductFormPr
             <FormItem>
               <FormLabel>Descrição</FormLabel>
               <FormControl>
-                <Input placeholder="Breve descrição do produto" {...field} />
+                <Textarea 
+                  placeholder="Descrição detalhada do produto" 
+                  className="min-h-[100px] resize-none" 
+                  {...field} 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
