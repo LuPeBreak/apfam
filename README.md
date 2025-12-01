@@ -115,6 +115,7 @@ O projeto requer as seguintes tabelas no Supabase:
     -   `admin/`: Componentes específicos da área administrativa.
 -   `lib/`: Utilitários e configurações (cliente Supabase, utils).
 -   `types/`: Definições de tipos TypeScript.
+-   `middleware.ts`: Proteção de rotas administrativas.
 
 ---
 
