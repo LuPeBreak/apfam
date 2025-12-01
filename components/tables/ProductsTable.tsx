@@ -74,6 +74,10 @@ export function ProductsTable({ initialData, categories }: ProductsTableProps) {
   const handleDelete = async () => {
     if (!deleteId) return;
 
+    // Cleanup associations first (optional if DB cascades, but safe to do)
+    await supabase.from("product_categories").delete().eq("product_id", deleteId);
+    await supabase.from("associate_products").delete().eq("product_id", deleteId);
+
     const { error } = await supabase.from("products").delete().eq("id", deleteId);
     if (error) {
       toast.error("Erro ao excluir produto");

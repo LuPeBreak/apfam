@@ -12,9 +12,10 @@ interface ImageUploadProps {
   value?: string;
   onChange: (url: string) => void;
   disabled?: boolean;
+  shape?: "default" | "circle";
 }
 
-export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
+export function ImageUpload({ value, onChange, disabled, shape = "default" }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -56,11 +57,19 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
     onChange("");
   };
 
+  const containerClass = shape === "circle" 
+    ? "relative h-40 w-40 rounded-full overflow-hidden border"
+    : "relative aspect-video w-40 rounded-md overflow-hidden border";
+
+  const placeholderClass = shape === "circle"
+    ? "h-40 w-40 rounded-full border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 transition-colors flex flex-col items-center justify-center cursor-pointer bg-muted/5"
+    : "w-40 aspect-video rounded-md border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 transition-colors flex flex-col items-center justify-center cursor-pointer bg-muted/5";
+
   return (
     <div className="space-y-4 w-full">
       <div className="flex items-center gap-4">
         {value ? (
-          <div className="relative aspect-video w-40 rounded-md overflow-hidden border">
+          <div className={containerClass}>
             <Image
               src={value}
               alt="Upload"
@@ -69,7 +78,7 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
             />
             <button
               onClick={handleRemove}
-              className="absolute top-1 right-1 bg-destructive text-destructive-foreground p-1 rounded-full shadow-sm hover:bg-destructive/90 transition-colors"
+              className="absolute top-1 right-1 bg-destructive text-destructive-foreground p-1 rounded-full shadow-sm hover:bg-destructive/90 transition-colors z-10"
               type="button"
               disabled={disabled}
             >
@@ -79,7 +88,7 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
         ) : (
           <div 
             onClick={() => fileInputRef.current?.click()}
-            className="w-40 aspect-video rounded-md border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 transition-colors flex flex-col items-center justify-center cursor-pointer bg-muted/5"
+            className={placeholderClass}
           >
             <ImagePlus className="h-6 w-6 text-muted-foreground mb-2" />
             <span className="text-xs text-muted-foreground">Upload Imagem</span>

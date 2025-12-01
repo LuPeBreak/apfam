@@ -60,6 +60,24 @@ export function CategoriesTable({ initialData }: CategoriesTableProps) {
   const handleDelete = async () => {
     if (!deleteId) return;
 
+    // Check for associated products
+    const { count, error: checkError } = await supabase
+      .from("product_categories")
+      .select("*", { count: 'exact', head: true })
+      .eq("category_id", deleteId);
+
+    if (checkError) {
+      toast.error("Erro ao verificar produtos associados");
+      console.error(checkError);
+      return;
+    }
+
+    if (count && count > 0) {
+      toast.error(`Não é possível excluir. Existem ${count} produtos associados a esta categoria.`);
+      setDeleteId(null);
+      return;
+    }
+
     const { error } = await supabase.from("categories").delete().eq("id", deleteId);
     if (error) {
       toast.error("Erro ao excluir categoria");

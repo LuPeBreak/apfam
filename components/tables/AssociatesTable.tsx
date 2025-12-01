@@ -74,6 +74,9 @@ export function AssociatesTable({ initialData, catalog }: AssociatesTableProps) 
   const handleDelete = async () => {
     if (!deleteId) return;
     
+    // Clean up associations first (optional if DB cascades, but safe to do)
+    await supabase.from("associate_products").delete().eq("associate_id", deleteId);
+
     const { error } = await supabase.from("associates").delete().eq("id", deleteId);
     if (error) {
       toast.error("Erro ao excluir associado");
