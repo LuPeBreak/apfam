@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { MapPin, Search, ArrowLeft } from "lucide-react";
-import Image from "next/image";
+
 import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import Link from "next/link";
 import { Associate } from "@/types";

@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { Associate } from "@/types";
+import { AssociateWithProducts } from "@/types/supabase-custom";
 import AssociatesClientPage from "./AssociatesClientPage";
 
 export const dynamic = 'force-dynamic';
@@ -23,16 +24,17 @@ export default async function AssociatesPage() {
     console.error("Error fetching associates:", error);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const formattedAssociates: Associate[] = (associatesData || []).map((a: any) => ({
+  const formattedAssociates: Associate[] = (associatesData as unknown as AssociateWithProducts[] || []).map((a) => ({
     id: a.id,
     name: a.name,
     bio: a.bio || "",
     location: a.location || "",
     avatarUrl: a.avatar_url,
-    products: a.associate_products.map((ap: any) => ({
-      id: ap.products.id,
-      name: ap.products.name
+    products: a.associate_products.map((ap) => ({
+      id: ap.product_id,
+      name: ap.products.name,
+      categoryIds: [],
+      categoryNames: []
     }))
   }));
 

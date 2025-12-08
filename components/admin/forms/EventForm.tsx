@@ -27,9 +27,11 @@ export const eventSchema = z.object({
 
 export type EventFormData = z.infer<typeof eventSchema>;
 
+import { Event } from "@/types";
+
 interface EventFormProps {
   onSubmit: (data: EventFormData) => void;
-  initialData?: any;
+  initialData?: Partial<Event>;
 }
 
 export function EventForm({ onSubmit, initialData }: EventFormProps) {
@@ -47,14 +49,19 @@ export function EventForm({ onSubmit, initialData }: EventFormProps) {
   useEffect(() => {
     if (initialData) {
       // Format date for datetime-local input (YYYY-MM-DDThh:mm)
-      const date = new Date(initialData.date);
-      const formattedDate = date.toISOString().slice(0, 16);
+      let formattedDate = "";
+      if (initialData.date) {
+        const date = new Date(initialData.date);
+        if (!isNaN(date.getTime())) {
+          formattedDate = date.toISOString().slice(0, 16);
+        }
+      }
 
       form.reset({
-        title: initialData.title,
+        title: initialData.title || "",
         date: formattedDate,
-        location: initialData.location,
-        description: initialData.description,
+        location: initialData.location || "",
+        description: initialData.description || "",
         imageUrl: initialData.imageUrl || "",
       });
     }

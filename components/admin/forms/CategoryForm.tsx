@@ -19,14 +19,16 @@ const categorySchema = z.object({
   name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres."),
 });
 
+import { Category } from "@/types";
+
 interface CategoryFormProps {
   onSubmit: (data: z.infer<typeof categorySchema>) => void;
-  initialData?: any;
+  initialData?: Partial<Category>;
 }
 
 export function CategoryForm({ onSubmit, initialData }: CategoryFormProps) {
   const form = useForm<z.infer<typeof categorySchema>>({
-    resolver: zodResolver(categorySchema) as any,
+    resolver: zodResolver(categorySchema),
     defaultValues: {
       name: "",
     },

@@ -6,8 +6,8 @@ export interface Category {
 export interface Product {
   id: string;
   name: string;
-  categoryIds: string[];
-  categoryNames: string[]; // Denormalized for display
+  categoryIds?: string[];
+  categoryNames?: string[]; // Denormalized for display
   description?: string;
   imageUrl?: string;
   associateId?: string;

@@ -2,6 +2,7 @@
 import { EventsTable } from "@/components/tables/EventsTable";
 import { supabase } from "@/lib/supabase";
 import { Event } from "@/types";
+import { DatabaseEvent } from "@/types/supabase-custom";
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +16,7 @@ export default async function EventsPage() {
     console.error("Error fetching events:", error);
   }
 
-  const formattedEvents: Event[] = (events || []).map((e: any) => ({
+  const formattedEvents: Event[] = (events as unknown as DatabaseEvent[] || []).map((e) => ({
     id: e.id,
     title: e.title,
     date: e.date,

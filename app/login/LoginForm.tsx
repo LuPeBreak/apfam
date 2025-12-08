@@ -32,14 +32,16 @@ export default function LoginForm() {
       toast.success("Login realizado com sucesso!");
       router.push("/admin");
       router.refresh();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
       let errorMessage = "Ocorreu um erro ao fazer login.";
       
-      if (err.message === "Invalid login credentials") {
-        errorMessage = "Credenciais inválidas. Verifique seu email e senha.";
-      } else if (err.message.includes("Email not confirmed")) {
-        errorMessage = "Email não confirmado.";
+      if (err instanceof Error) {
+        if (err.message === "Invalid login credentials") {
+          errorMessage = "Credenciais inválidas. Verifique seu email e senha.";
+        } else if (err.message.includes("Email not confirmed")) {
+          errorMessage = "Email não confirmado.";
+        }
       }
 
       toast.error(errorMessage);

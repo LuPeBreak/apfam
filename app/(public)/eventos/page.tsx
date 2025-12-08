@@ -4,6 +4,8 @@ import EventsClientPage from "./EventsClientPage";
 
 export const dynamic = 'force-dynamic';
 
+import { DatabaseEvent } from "@/types/supabase-custom";
+
 export default async function EventsPage() {
   const { data: events, error } = await supabase
     .from('events')
@@ -14,8 +16,8 @@ export default async function EventsPage() {
     console.error("Error fetching events:", error);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const formattedEvents: Event[] = (events || []).map((e: any) => ({
+   
+  const formattedEvents: Event[] = (events as unknown as DatabaseEvent[] || []).map((e) => ({
     id: e.id,
     title: e.title,
     date: e.date,

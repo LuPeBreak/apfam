@@ -23,9 +23,10 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
+  output: 'standalone',
+  // typescript: {
+  //   ignoreBuildErrors: true,
+  // },
 
 };
 

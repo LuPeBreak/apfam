@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { Event, Associate, Product } from "@/types";
+import { DatabaseEvent, ProductWithCategories, AssociateWithProducts } from "@/types/supabase-custom";
 import HomeClientPage from "./HomeClientPage";
 
 export const dynamic = 'force-dynamic';
@@ -42,7 +43,7 @@ export default async function Home() {
     `)
     .limit(4);
 
-  const formattedEvents: Event[] = (eventsData || []).map((e: any) => ({
+  const formattedEvents: Event[] = (eventsData as unknown as DatabaseEvent[] || []).map((e) => ({
     id: e.id,
     title: e.title,
     date: e.date,
@@ -51,26 +52,26 @@ export default async function Home() {
     imageUrl: e.image_url,
   }));
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const formattedProducts: Product[] = (productsData || []).map((p: any) => ({
+  const formattedProducts: Product[] = (productsData as unknown as ProductWithCategories[] || []).map((p) => ({
     id: p.id,
     name: p.name,
     description: p.description || "",
     imageUrl: p.image_url,
-    categoryIds: p.product_categories.map((pc: any) => pc.category_id),
-    categoryNames: p.product_categories.map((pc: any) => pc.categories.name),
+    categoryIds: p.product_categories.map((pc) => pc.category_id),
+    categoryNames: p.product_categories.map((pc) => pc.categories.name),
   }));
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const formattedAssociates: Associate[] = (associatesData || []).map((a: any) => ({
+  const formattedAssociates: Associate[] = (associatesData as unknown as AssociateWithProducts[] || []).map((a) => ({
     id: a.id,
     name: a.name,
     bio: a.bio || "",
     location: a.location || "",
     avatarUrl: a.avatar_url,
-    products: a.associate_products.map((ap: any) => ({
-      id: ap.products.id,
-      name: ap.products.name
+    products: a.associate_products.map((ap) => ({
+      id: ap.product_id,
+      name: ap.products.name,
+      categoryIds: [],
+      categoryNames: []
     }))
   }));
 

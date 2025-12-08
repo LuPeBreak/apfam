@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { MultiSelect } from "@/components/multi-select";
 import { Search } from "lucide-react";
-import Image from "next/image";
+
 import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -105,7 +105,7 @@ export default function ProductsClientPage({ initialProducts, categories }: Prod
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                   <Badge className="absolute top-3 right-3 bg-white/90 text-primary hover:bg-white">
-                    {product.categoryNames.join(", ")}
+                    {(product.categoryNames || []).join(", ")}
                   </Badge>
                 </div>
                 <CardHeader>

@@ -63,9 +63,10 @@ export default function ContactPage() {
       setIsSubmitted(true);
       form.reset();
       toast.success("Mensagem enviada com sucesso!");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      toast.error(error.message || "Erro ao enviar mensagem. Tente novamente.");
+      const message = error instanceof Error ? error.message : "Erro ao enviar mensagem. Tente novamente.";
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }

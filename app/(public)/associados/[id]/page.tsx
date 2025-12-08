@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { ArrowLeft, MapPin, ShoppingBag, Check } from "lucide-react";
 
 export const dynamic = 'force-dynamic';
@@ -38,8 +38,19 @@ export default async function AssociatePage({ params }: AssociatePageProps) {
     notFound();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const products = associate.associate_products.map((ap: any) => ap.products);
+  // Cast to match the query structure
+  const formattedAssociate = associate as unknown as {
+    associate_products: {
+      products: {
+        id: string;
+        name: string;
+        description: string;
+        image_url: string;
+      };
+    }[];
+  };
+
+  const products = formattedAssociate.associate_products.map((ap) => ap.products);
 
   return (
     <div className="min-h-screen bg-background pb-20">

@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -12,10 +13,9 @@ import {
   CalendarDays,
   ShoppingBag,
   Tags,
-  Home,
   LogOut,
   Sprout,
-  User
+  User as UserIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
@@ -49,14 +49,16 @@ const sidebarItems = [
   {
     title: "Perfil",
     href: "/admin/perfil",
-    icon: User,
+    icon: UserIcon,
   },
 ];
+
+import { User } from "@supabase/supabase-js";
 
 export function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     // Fetch initial user
@@ -116,7 +118,7 @@ export function AdminSidebar() {
         <div className="flex items-center gap-3 mb-3">
           <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold overflow-hidden relative">
             {userAvatar ? (
-              <img src={userAvatar} alt={userName} className="h-full w-full object-cover" />
+              <Image src={userAvatar} alt={userName} fill className="object-cover" />
             ) : (
               userName.charAt(0).toUpperCase()
             )}

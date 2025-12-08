@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image, { ImageProps } from "next/image";
 import { User, Calendar, Sprout } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -20,11 +20,12 @@ export function ImageWithFallback({
   ...props 
 }: ImageWithFallbackProps) {
   const [error, setError] = useState(false);
+  const [prevSrc, setPrevSrc] = useState(src);
 
-  // Reset error state when src changes
-  useEffect(() => {
+  if (src !== prevSrc) {
+    setPrevSrc(src);
     setError(false);
-  }, [src]);
+  }
 
   const hasSrc = src && src.trim().length > 0;
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Button } from "@/components/ui/button";
+
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/lib/supabase";
 import { ImagePlus, Loader2, X } from "lucide-react";

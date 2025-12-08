@@ -6,8 +6,10 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
+import { User } from "@supabase/supabase-js";
+
 export default function ProfilePage() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const router = useRouter();
@@ -29,10 +31,10 @@ export default function ProfilePage() {
   const handleSubmit = async (data: ProfileFormData) => {
     setSaving(true);
     try {
-      const updates: any = {
+      const updates: { data: { full_name: string; avatar_url: string }; password?: string } = {
         data: {
           full_name: data.fullName,
-          avatar_url: data.avatarUrl,
+          avatar_url: data.avatarUrl || "",
         }
       };
 
@@ -48,18 +50,22 @@ export default function ProfilePage() {
       router.refresh();
       
       // Update local state to reflect changes immediately if needed
-      setUser((prev: any) => ({
-        ...prev,
-        user_metadata: {
-          ...prev.user_metadata,
-          full_name: data.fullName,
-          avatar_url: data.avatarUrl,
-        }
-      }));
+      setUser((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          user_metadata: {
+            ...prev.user_metadata,
+            full_name: data.fullName,
+            avatar_url: data.avatarUrl,
+          }
+        } as User;
+      });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error updating profile:", error);
-      toast.error(error.message || "Erro ao atualizar perfil");
+      const message = error instanceof Error ? error.message : "Erro ao atualizar perfil";
+      toast.error(message);
     } finally {
       setSaving(false);
     }

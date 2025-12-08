@@ -1,6 +1,7 @@
 import { CategoriesTable } from "@/components/tables/CategoriesTable";
 import { supabase } from "@/lib/supabase";
 import { Category } from "@/types";
+import { DatabaseCategory } from "@/types/supabase-custom";
 
 export const dynamic = 'force-dynamic';
 
@@ -16,7 +17,8 @@ export default async function CategoriesPage() {
   }
 
   // Cast to Category[] to ensure type compatibility
-  const formattedCategories: Category[] = (categories || []).map((cat: any) => ({
+  // Cast to Category[] to ensure type compatibility
+  const formattedCategories: Category[] = (categories as unknown as DatabaseCategory[] || []).map((cat) => ({
     id: cat.id,
     name: cat.name,
   }));

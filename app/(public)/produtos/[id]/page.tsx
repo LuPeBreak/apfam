@@ -1,11 +1,12 @@
 import { supabase } from "@/lib/supabase";
+import { ProductWithCategoriesAndAssociates } from "@/types/supabase-custom";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, MessageCircle, Mail, MapPin, User } from "lucide-react";
+import { ArrowLeft, MessageCircle, Mail, User } from "lucide-react";
 import { siteConfig } from "@/lib/config";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProducerList } from "@/components/custom/producer-list";
@@ -46,10 +47,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const categoryNames = product.product_categories.map((pc: any) => pc.categories.name);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const associates = product.associate_products.map((ap: any) => ap.associates);
+  // Cast to ensure type safety for joined tables
+  const typedProduct = product as unknown as ProductWithCategoriesAndAssociates;
+
+  const categoryNames = typedProduct.product_categories.map((pc) => pc.categories.name);
+  const associates = typedProduct.associate_products.map((ap) => ap.associates);
 
   return (
     <div className="min-h-screen bg-gray-50/50">
@@ -135,7 +137,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   <Link 
                     href={`https://wa.me/${siteConfig.contact.whatsapp}?text=Olá, tenho interesse no produto *${product.name}* ${
                       associates.length > 0 
-                        ? `do(s) produtor(es) *${associates.map((a: any) => a.name).join(", ")}*` 
+                        ? `do(s) produtor(es) *${associates.map((a) => a.name).join(", ")}*` 
                         : "da APFAM"
                     } que vi no site.`}
                     target="_blank"
