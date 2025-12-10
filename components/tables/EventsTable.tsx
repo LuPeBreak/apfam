@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { EventForm, EventFormData } from "@/components/admin/forms/EventForm";
 import { toast } from "sonner";
+import { deleteImageFromStorage } from "@/lib/storage-utils";
 
 interface EventsTableProps {
   initialData: Event[];
@@ -60,6 +61,12 @@ export function EventsTable({ initialData }: EventsTableProps) {
   const handleDelete = async () => {
     if (!deleteId) return;
 
+    // Delete image from storage if it exists
+    const eventToDelete = data.find(e => e.id === deleteId);
+    if (eventToDelete?.imageUrl) {
+      await deleteImageFromStorage(eventToDelete.imageUrl);
+    }
+
     const { error } = await supabase.from("events").delete().eq("id", deleteId);
     if (error) {
       toast.error("Erro ao excluir evento");
@@ -75,6 +82,12 @@ export function EventsTable({ initialData }: EventsTableProps) {
   const handleSubmit = async (formData: EventFormData) => {
     try {
       if (editingId) {
+        // If updating and image changed, delete old image
+        const oldEvent = data.find(e => e.id === editingId);
+        if (oldEvent?.imageUrl && formData.imageUrl !== oldEvent.imageUrl) {
+          await deleteImageFromStorage(oldEvent.imageUrl);
+        }
+
         // Update event
         const { error } = await supabase
           .from("events")

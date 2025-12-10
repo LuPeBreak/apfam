@@ -58,8 +58,8 @@ export function ImageUpload({ value, onChange, disabled, shape = "default" }: Im
   };
 
   const containerClass = shape === "circle" 
-    ? "relative h-40 w-40 rounded-full overflow-hidden border"
-    : "relative aspect-video w-40 rounded-md overflow-hidden border";
+    ? "h-full w-full rounded-full overflow-hidden border"
+    : "h-full w-full rounded-md overflow-hidden border";
 
   const placeholderClass = shape === "circle"
     ? "h-40 w-40 rounded-full border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 transition-colors flex flex-col items-center justify-center cursor-pointer bg-muted/5"
@@ -69,20 +69,22 @@ export function ImageUpload({ value, onChange, disabled, shape = "default" }: Im
     <div className="space-y-4 w-full">
       <div className="flex items-center gap-4">
         {value ? (
-          <div className={containerClass}>
-            <Image
-              src={value}
-              alt="Upload"
-              fill
-              className="object-cover"
-            />
+          <div className={`${shape === "circle" ? "h-40 w-40" : "aspect-video w-40"} relative`}>
+            <div className={containerClass.replace("relative", "absolute inset-0")}>
+              <Image
+                src={value}
+                alt="Upload"
+                fill
+                className="object-cover"
+              />
+            </div>
             <button
               onClick={handleRemove}
-              className="absolute top-1 right-1 bg-destructive text-destructive-foreground p-1 rounded-full shadow-sm hover:bg-destructive/90 transition-colors z-10"
+              className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground p-1.5 rounded-full shadow-md hover:bg-destructive/90 transition-colors z-20"
               type="button"
               disabled={disabled}
             >
-              <X className="h-3 w-3" />
+              <X className="h-4 w-4" />
             </button>
           </div>
         ) : (

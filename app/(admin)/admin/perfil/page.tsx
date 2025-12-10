@@ -5,6 +5,7 @@ import { ProfileForm, ProfileFormData } from "@/components/admin/forms/ProfileFo
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { deleteImageFromStorage } from "@/lib/storage-utils";
 
 import { User } from "@supabase/supabase-js";
 
@@ -45,6 +46,11 @@ export default function ProfilePage() {
       const { error } = await supabase.auth.updateUser(updates);
 
       if (error) throw error;
+
+      // Delete old avatar if it was changed (even if new one is empty)
+      if (user?.user_metadata?.avatar_url && data.avatarUrl !== user.user_metadata.avatar_url) {
+        await deleteImageFromStorage(user.user_metadata.avatar_url);
+      }
 
       toast.success("Perfil atualizado com sucesso!");
       router.refresh();

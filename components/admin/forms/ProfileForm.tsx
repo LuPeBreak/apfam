@@ -81,7 +81,7 @@ export function ProfileForm({ onSubmit, initialData, isLoading }: ProfileFormPro
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2 items-start">
             <FormField
               control={form.control}
               name="fullName"
@@ -96,15 +96,20 @@ export function ProfileForm({ onSubmit, initialData, isLoading }: ProfileFormPro
               )}
             />
             
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input value={initialData?.email || ""} disabled className="bg-muted" />
-              </FormControl>
-              <FormDescription>
-                O email não pode ser alterado.
-              </FormDescription>
-            </FormItem>
+            <FormField
+              name="email"
+              render={() => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input value={initialData?.email || ""} disabled className="bg-muted" />
+                  </FormControl>
+                  <FormDescription>
+                    O email não pode ser alterado.
+                  </FormDescription>
+                </FormItem>
+              )}
+            />
           </div>
 
           <FormField

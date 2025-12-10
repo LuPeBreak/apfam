@@ -37,6 +37,7 @@ import {
 import { Combobox } from "@/components/combobox";
 import { ProductForm, ProductFormData } from "@/components/admin/forms/ProductForm";
 import { toast } from "sonner";
+import { deleteImageFromStorage } from "@/lib/storage-utils";
 
 interface ProductsTableProps {
   initialData: Product[];
@@ -64,8 +65,16 @@ export function ProductsTable({ initialData, categories }: ProductsTableProps) {
     setDeleteId(id);
   };
 
+// ... existing imports
+
   const handleDelete = async () => {
     if (!deleteId) return;
+
+    // Get the product to find the image URL
+    const productToDelete = data.find(p => p.id === deleteId);
+    if (productToDelete?.imageUrl) {
+      await deleteImageFromStorage(productToDelete.imageUrl);
+    }
 
     // Cleanup associations first (optional if DB cascades, but safe to do)
     await supabase.from("product_categories").delete().eq("product_id", deleteId);
@@ -88,6 +97,12 @@ export function ProductsTable({ initialData, categories }: ProductsTableProps) {
       let productId = editingId;
 
       if (editingId) {
+        // If updating and image changed, delete old image
+        const oldProduct = data.find(p => p.id === editingId);
+        if (oldProduct?.imageUrl && formData.imageUrl !== oldProduct.imageUrl) {
+          await deleteImageFromStorage(oldProduct.imageUrl);
+        }
+
         // Update product
         const { error } = await supabase
           .from("products")

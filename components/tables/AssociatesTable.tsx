@@ -38,6 +38,7 @@ import {
 import { Combobox } from "@/components/combobox";
 import { AssociateForm, AssociateFormData } from "@/components/admin/forms/AssociateForm";
 import { toast } from "sonner";
+import { deleteImageFromStorage } from "@/lib/storage-utils";
 
 interface AssociatesTableProps {
   initialData: Associate[];
@@ -68,6 +69,12 @@ export function AssociatesTable({ initialData, catalog }: AssociatesTableProps) 
   const handleDelete = async () => {
     if (!deleteId) return;
     
+    // Delete image from storage if it exists
+    const associateToDelete = data.find(a => a.id === deleteId);
+    if (associateToDelete?.avatarUrl) {
+      await deleteImageFromStorage(associateToDelete.avatarUrl);
+    }
+
     // Clean up associations first (optional if DB cascades, but safe to do)
     await supabase.from("associate_products").delete().eq("associate_id", deleteId);
 
@@ -88,6 +95,12 @@ export function AssociatesTable({ initialData, catalog }: AssociatesTableProps) 
       let associateId = editingId;
 
       if (editingId) {
+        // If updating and image changed, delete old image
+        const oldAssociate = data.find(a => a.id === editingId);
+        if (oldAssociate?.avatarUrl && formData.avatarUrl !== oldAssociate.avatarUrl) {
+          await deleteImageFromStorage(oldAssociate.avatarUrl);
+        }
+
         // Update associate
         const { error } = await supabase
           .from("associates")
