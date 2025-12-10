@@ -21,6 +21,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "bmoghybiddxohxacuotp.supabase.co",
       },
+      {
+        protocol: "http",
+        hostname: "supabasekong-wskow4owkcg8k4wokg4c0gkg.212.85.12.178.sslip.io",
+      },
     ],
   },
   output: 'standalone',
