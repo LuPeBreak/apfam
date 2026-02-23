@@ -1,11 +1,18 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { siteConfig } from '@/lib/config';
+import { env } from '@/lib/env';
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { name, email, phone, productionType, message } = body;
+    const { name, email, phone, productionType, message, _honey } = body;
+
+    // Honeypot check - if _honey is filled, it's a bot
+    if (_honey) {
+      console.log('Bot detected via honeypot');
+      return NextResponse.json({ success: true }); // Fake success to confuse bots
+    }
 
     // Validate required fields
     if (!name || !email || !message) {
@@ -15,14 +22,23 @@ export async function POST(req: Request) {
       );
     }
 
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { error: 'Email inválido.' },
+        { status: 400 }
+      );
+    }
+
     // Create transporter
     const transporter = nodemailer.createTransport({
-      host: siteConfig.email.host,
-      port: siteConfig.email.port,
-      secure: siteConfig.email.port === 465, // true for 465, false for other ports
+      host: env.EMAIL_HOST,
+      port: env.EMAIL_PORT,
+      secure: env.EMAIL_PORT === 465, // true for 465, false for other ports
       auth: {
-        user: siteConfig.email.user,
-        pass: siteConfig.email.pass,
+        user: env.EMAIL_USER,
+        pass: env.EMAIL_PASS,
       },
     });
 
@@ -44,7 +60,7 @@ export async function POST(req: Request) {
 
     // Send email
     await transporter.sendMail({
-      from: siteConfig.email.from,
+      from: env.EMAIL_FROM,
       to: siteConfig.contact.email, // Send to admin
       subject: `Novo Contato: ${name} - ${productionType}`,
       html: htmlContent,

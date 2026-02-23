@@ -23,6 +23,7 @@ export default async function EventsPage() {
     location: e.location || "",
     description: e.description || "",
     imageUrl: e.image_url || "https://images.unsplash.com/photo-1531058020387-3be344556be6?w=800&q=80",
+    slug: e.slug,
   }));
 
   return (

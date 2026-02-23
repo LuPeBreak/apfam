@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import { Associate } from "@/types";
 import { AssociateWithProducts } from "@/types/supabase-custom";
-import AssociatesClientPage from "./AssociatesClientPage";
+import AssociatesClientPage from "./_components/AssociatesClientPage";
 
 export const dynamic = 'force-dynamic';
 
@@ -30,9 +30,11 @@ export default async function AssociatesPage() {
     bio: a.bio || "",
     location: a.location || "",
     avatarUrl: a.avatar_url,
+    slug: a.slug,
     products: a.associate_products.map((ap) => ({
       id: ap.product_id,
       name: ap.products.name,
+      slug: ap.products.slug,
       categoryIds: [],
       categoryNames: []
     }))

@@ -13,11 +13,13 @@ export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage(null);
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
@@ -34,17 +36,18 @@ export default function LoginForm() {
       router.refresh();
     } catch (err: unknown) {
       console.error(err);
-      let errorMessage = "Ocorreu um erro ao fazer login.";
+      let message = "Ocorreu um erro ao fazer login.";
       
       if (err instanceof Error) {
         if (err.message === "Invalid login credentials") {
-          errorMessage = "Credenciais inválidas. Verifique seu email e senha.";
+          message = "Credenciais inválidas. Verifique seu email e senha.";
         } else if (err.message.includes("Email not confirmed")) {
-          errorMessage = "Email não confirmado.";
+          message = "Email não confirmado. Verifique sua caixa de entrada.";
         }
       }
 
-      toast.error(errorMessage);
+      setErrorMessage(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -82,6 +85,11 @@ export default function LoginForm() {
                 required
               />
             </div>
+            {errorMessage && (
+              <div role="alert" className="text-sm font-medium text-destructive bg-destructive/10 border border-destructive/20 rounded-md px-3 py-2">
+                {errorMessage}
+              </div>
+            )}
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Entrando..." : "Entrar"}
             </Button>

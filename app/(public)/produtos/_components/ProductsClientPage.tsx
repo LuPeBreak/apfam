@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { MultiSelect } from "@/components/multi-select";
-import { Search } from "lucide-react";
+import { Search, ArrowRight } from "lucide-react";
 
 import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { motion } from "framer-motion";
@@ -95,42 +95,42 @@ export default function ProductsClientPage({ initialProducts, categories }: Prod
               transition={{ duration: 0.3 }}
               layout
             >
-              <Card className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-all duration-300 group border-none shadow-md">
-                <div className="relative h-56 w-full overflow-hidden">
-                  <ImageWithFallback
-                    src={product.imageUrl}
-                    fallbackType="product"
-                    alt={product.name}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <Badge className="absolute top-3 right-3 bg-white/90 text-primary hover:bg-white">
-                    {(product.categoryNames || []).join(", ")}
-                  </Badge>
-                </div>
-                <CardHeader>
-                  <div className="flex items-center gap-2 mb-1">
-                    <Badge variant="secondary" className="text-xs font-normal">
-                      {product.associateCount && product.associateCount > 0 
-                        ? `${product.associateCount} ${product.associateCount === 1 ? 'produtor' : 'produtores'}`
-                        : 'Disponível'}
+              <Link href={`/produtos/${product.slug}`} className="block group h-full">
+                <Card className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-all duration-300 border-none shadow-md">
+                  <div className="relative h-56 w-full overflow-hidden">
+                    <ImageWithFallback
+                      src={product.imageUrl}
+                      fallbackType="product"
+                      alt={product.name}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <Badge className="absolute top-3 right-3 bg-white/90 text-primary hover:bg-white">
+                      {(product.categoryNames || []).join(", ")}
                     </Badge>
                   </div>
-                  <CardTitle className="text-xl">{product.name}</CardTitle>
-                </CardHeader>
-                <CardContent className="flex-1">
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    {product.description}
-                  </p>
-                </CardContent>
-                <CardFooter className="pt-0">
-                  <Button asChild className="w-full group-hover:bg-primary/90">
-                    <Link href={`/produtos/${product.id}`}>
-                      Ver Detalhes
-                    </Link>
-                  </Button>
-                </CardFooter>
-              </Card>
+                  <CardHeader>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge variant="secondary" className="text-xs font-normal">
+                        {product.associateCount && product.associateCount > 0 
+                          ? `${product.associateCount} ${product.associateCount === 1 ? 'produtor' : 'produtores'}`
+                          : 'Disponível'}
+                      </Badge>
+                    </div>
+                    <CardTitle className="text-xl group-hover:text-primary transition-colors">{product.name}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex-1">
+                    <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3">
+                      {product.description}
+                    </p>
+                  </CardContent>
+                  <CardFooter className="pt-0 mt-auto">
+                    <div className="text-primary font-medium text-sm flex items-center">
+                      Ver Detalhes <ArrowRight className="h-4 w-4 ml-1" />
+                    </div>
+                  </CardFooter>
+                </Card>
+              </Link>
             </motion.div>
           ))}
         </div>

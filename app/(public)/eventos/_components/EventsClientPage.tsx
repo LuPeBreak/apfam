@@ -61,7 +61,7 @@ export default function EventsClientPage({ initialEvents }: EventsClientPageProp
                 transition={{ duration: 0.3 }}
                 layout
               >
-                <Link href={`/eventos/${event.id}`} className="block group">
+                <Link href={`/eventos/${event.slug}`} className="block group">
                   <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 border-none shadow-md">
                     <div className="flex flex-col md:flex-row">
                       <div className="relative h-48 md:h-auto md:w-1/3 shrink-0 overflow-hidden">

@@ -101,10 +101,17 @@ export function MultiSelect({
             <CommandInput placeholder="Search..." />
             <CommandEmpty>No item found.</CommandEmpty>
             <CommandList>
-              <CommandGroup className="max-h-64 overflow-auto">
+              <CommandGroup
+                role="listbox"
+                aria-multiselectable="true"
+                aria-label="Selecionar categorias"
+                className="max-h-64 overflow-auto"
+              >
                 {options.map((option) => (
                   <CommandItem
                     key={option.value}
+                    role="option"
+                    aria-selected={selected.includes(option.value)}
                     onSelect={() => {
                       onChange(
                         selected.includes(option.value)

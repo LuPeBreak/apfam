@@ -15,39 +15,14 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
-import { ImageUpload } from "@/components/image-upload";
 import { Eye, EyeOff } from "lucide-react";
 
-const profileSchema = z.object({
-  fullName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres."),
-  avatarUrl: z.string().optional(),
-  password: z.string().optional().or(z.literal("")),
-  confirmPassword: z.string().optional().or(z.literal("")),
-}).refine((data) => {
-  if (data.password && data.password.length > 0) {
-    if (data.password.length < 6) return false;
-  }
-  return true;
-}, {
-  message: "A senha deve ter pelo menos 6 caracteres",
-  path: ["password"],
-}).refine((data) => {
-  if (data.password && data.password !== data.confirmPassword) {
-    return false;
-  }
-  return true;
-}, {
-  message: "As senhas não conferem",
-  path: ["confirmPassword"],
-});
-
-export type ProfileFormData = z.infer<typeof profileSchema>;
+import { profileSchema, ProfileFormData } from "@/lib/schemas";
 
 interface ProfileFormProps {
   onSubmit: (data: ProfileFormData) => void;
   initialData?: {
     fullName: string;
-    avatarUrl?: string;
     email: string;
   };
   isLoading?: boolean;
@@ -60,7 +35,6 @@ export function ProfileForm({ onSubmit, initialData, isLoading }: ProfileFormPro
     resolver: zodResolver(profileSchema),
     defaultValues: {
       fullName: "",
-      avatarUrl: "",
       password: "",
       confirmPassword: "",
     },
@@ -70,7 +44,6 @@ export function ProfileForm({ onSubmit, initialData, isLoading }: ProfileFormPro
     if (initialData) {
       form.reset({
         fullName: initialData.fullName,
-        avatarUrl: initialData.avatarUrl || "",
         password: "",
         confirmPassword: "",
       });
@@ -112,23 +85,7 @@ export function ProfileForm({ onSubmit, initialData, isLoading }: ProfileFormPro
             />
           </div>
 
-          <FormField
-            control={form.control}
-            name="avatarUrl"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Avatar</FormLabel>
-                <FormControl>
-                  <ImageUpload 
-                    value={field.value || ""} 
-                    onChange={(url) => field.onChange(url)}
-                    shape="circle"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+
 
           <div className="grid gap-4 md:grid-cols-2">
             <FormField

@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { supabaseServerPublic } from "@/lib/supabase/server-public";
 import { ProductWithCategoriesAndAssociates } from "@/types/supabase-custom";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -10,19 +10,44 @@ import { ArrowLeft, MessageCircle, Mail, User } from "lucide-react";
 import { siteConfig } from "@/lib/config";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProducerList } from "@/components/custom/producer-list";
+import { Metadata } from "next";
 
 export const dynamic = 'force-dynamic';
 
 interface ProductPageProps {
   params: Promise<{
-    id: string;
+    slug: string;
   }>;
 }
 
-export default async function ProductPage({ params }: ProductPageProps) {
-  const { id } = await params;
+export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  
+  const { data: product } = await supabaseServerPublic
+    .from('products')
+    .select('name, description, image_url')
+    .eq('slug', slug)
+    .single();
 
-  const { data: product, error } = await supabase
+  if (!product) {
+    return {
+      title: 'Produto não encontrado | APFAM',
+    };
+  }
+
+  return {
+    title: `${product.name} | Produtos APFAM`,
+    description: product.description?.substring(0, 160) || `Confira ${product.name}, um produto de qualidade da agricultura familiar.`,
+    openGraph: {
+      images: product.image_url ? [product.image_url] : [],
+    },
+  };
+}
+
+export default async function ProductPage({ params }: ProductPageProps) {
+  const { slug } = await params;
+
+  const { data: product, error } = await supabaseServerPublic
     .from('products')
     .select(`
       *,
@@ -35,12 +60,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
         associates (
           id,
           name,
+          slug,
           location,
           avatar_url
         )
       )
     `)
-    .eq('id', id)
+    .eq('slug', slug)
     .single();
 
   if (error || !product) {

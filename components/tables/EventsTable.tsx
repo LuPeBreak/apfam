@@ -34,7 +34,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { EventForm, EventFormData } from "@/components/admin/forms/EventForm";
+import { EventForm } from "@/components/admin/forms/EventForm";
+import { EventFormData } from "@/lib/schemas";
 import { toast } from "sonner";
 import { deleteImageFromStorage } from "@/lib/storage-utils";
 
@@ -93,6 +94,7 @@ export function EventsTable({ initialData }: EventsTableProps) {
           .from("events")
           .update({
             title: formData.title,
+            slug: formData.slug,
             date: formData.date,
             location: formData.location,
             description: formData.description,
@@ -100,13 +102,14 @@ export function EventsTable({ initialData }: EventsTableProps) {
           })
           .eq("id", editingId);
         if (error) throw error;
-        setData(data.map((item) => (item.id === editingId ? { ...item, ...formData, imageUrl: formData.imageUrl } : item)));
+        setData(data.map((item) => (item.id === editingId ? { ...item, ...formData, imageUrl: formData.imageUrl, slug: formData.slug } : item)));
       } else {
         // Create event
         const { data: newEvent, error } = await supabase
           .from("events")
           .insert([{
             title: formData.title,
+            slug: formData.slug,
             date: formData.date,
             location: formData.location,
             description: formData.description,
@@ -122,7 +125,8 @@ export function EventsTable({ initialData }: EventsTableProps) {
                 date: newEvent.date,
                 location: newEvent.location,
                 description: newEvent.description,
-                imageUrl: newEvent.image_url
+                imageUrl: newEvent.image_url,
+                slug: newEvent.slug
             }]);
         }
       }

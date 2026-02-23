@@ -6,6 +6,7 @@ export interface Category {
 export interface Product {
   id: string;
   name: string;
+  slug: string;
   categoryIds?: string[];
   categoryNames?: string[]; // Denormalized for display
   description?: string;
@@ -18,6 +19,7 @@ export interface Product {
 export interface Associate {
   id: string;
   name: string;
+  slug: string;
   bio: string;
   avatarUrl: string;
   products: Product[]; // Products this associate sells
@@ -27,6 +29,7 @@ export interface Associate {
 export interface Event {
   id: string;
   title: string;
+  slug: string;
   description: string;
   date: string; // ISO string
   location: string;

@@ -54,12 +54,13 @@ export default function AssociatesClientPage({ initialAssociates }: AssociatesCl
         {/* Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredAssociates.map((associate) => (
-            <Link key={associate.id} href={`/associados/${associate.id}`} className="block group h-full">
+            <Link key={associate.id} href={`/associados/${associate.slug}`} className="block group h-full">
               <Card className="h-full overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300 bg-card flex flex-col">
                 <div className="relative h-56 w-full overflow-hidden">
                   <ImageWithFallback
                     src={associate.avatarUrl}
                     fallbackType="associate"
+                    name={associate.name}
                     alt={associate.name}
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-105"

@@ -2,7 +2,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -86,7 +85,6 @@ export function AdminSidebar() {
 
   const userName = user?.user_metadata?.full_name || "";
   const userEmail = user?.email || "";
-  const userAvatar = user?.user_metadata?.avatar_url;
 
   return (
     <div className="flex flex-col h-full border-r bg-muted/10">
@@ -117,11 +115,7 @@ export function AdminSidebar() {
       <div className="p-4 border-t border-border">
         <div className="flex items-center gap-3 mb-3">
           <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold overflow-hidden relative">
-            {userAvatar ? (
-              <Image src={userAvatar} alt={userName} fill className="object-cover" />
-            ) : (
-              userName.charAt(0).toUpperCase()
-            )}
+            {userName.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 overflow-hidden">
             <p className="text-sm font-medium truncate">{userName}</p>

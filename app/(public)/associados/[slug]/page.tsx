@@ -1,23 +1,49 @@
-import { supabase } from "@/lib/supabase";
+import { supabaseServerPublic } from "@/lib/supabase/server-public";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { InitialsAvatar } from "@/components/ui/initials-avatar";
 
 import { ArrowLeft, MapPin, ShoppingBag, Check } from "lucide-react";
+import { Metadata } from "next";
 
 export const dynamic = 'force-dynamic';
 
 interface AssociatePageProps {
   params: Promise<{
-    id: string;
+    slug: string;
   }>;
 }
 
-export default async function AssociatePage({ params }: AssociatePageProps) {
-  const { id } = await params;
+export async function generateMetadata({ params }: AssociatePageProps): Promise<Metadata> {
+  const { slug } = await params;
+  
+  const { data: associate } = await supabaseServerPublic
+    .from('associates')
+    .select('name, bio, avatar_url')
+    .eq('slug', slug)
+    .single();
 
-  const { data: associate, error } = await supabase
+  if (!associate) {
+    return {
+      title: 'Associado não encontrado | APFAM',
+    };
+  }
+
+  return {
+    title: `${associate.name} | Associados APFAM`,
+    description: associate.bio?.substring(0, 160) || `Conheça ${associate.name}, produtor associado da APFAM.`,
+    openGraph: {
+      images: associate.avatar_url ? [associate.avatar_url] : [],
+    },
+  };
+}
+
+export default async function AssociatePage({ params }: AssociatePageProps) {
+  const { slug } = await params;
+
+  const { data: associate, error } = await supabaseServerPublic
     .from('associates')
     .select(`
       *,
@@ -26,12 +52,13 @@ export default async function AssociatePage({ params }: AssociatePageProps) {
         products (
           id,
           name,
+          slug,
           description,
           image_url
         )
       )
     `)
-    .eq('id', id)
+    .eq('slug', slug)
     .single();
 
   if (error || !associate) {
@@ -84,14 +111,20 @@ export default async function AssociatePage({ params }: AssociatePageProps) {
           <div className="lg:col-span-4">
             <div className="bg-card rounded-xl shadow-lg border overflow-hidden sticky top-24">
               <div className="p-6 flex flex-col items-center text-center">
-                <div className="relative h-40 w-40 rounded-full border-4 border-background shadow-md overflow-hidden mb-4">
-                  <Image
-                    src={associate.avatar_url || "https://github.com/shadcn.png"}
-                    alt={associate.name}
-                    fill
-                    className="object-cover"
-                    priority
-                  />
+                <div className="mb-4">
+                  {associate.avatar_url ? (
+                    <div className="relative h-40 w-40 rounded-full border-4 border-background shadow-md overflow-hidden">
+                      <Image
+                        src={associate.avatar_url}
+                        alt={associate.name}
+                        fill
+                        className="object-cover"
+                        priority
+                      />
+                    </div>
+                  ) : (
+                    <InitialsAvatar name={associate.name} size="xl" className="border-4 border-background shadow-md" />
+                  )}
                 </div>
                 <h1 className="text-2xl font-bold text-primary font-serif mb-2">{associate.name}</h1>
                 <div className="flex items-center text-muted-foreground text-sm mb-6 bg-muted/50 px-3 py-1 rounded-full">
@@ -141,7 +174,7 @@ export default async function AssociatePage({ params }: AssociatePageProps) {
                 <div className="grid sm:grid-cols-2 gap-6">
                   {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   {products.map((product: any) => (
-                    <Link key={product.id} href={`/produtos/${product.id}`} className="group">
+                    <Link key={product.id} href={`/produtos/${product.slug}`} className="group">
                       <div className="bg-card rounded-xl overflow-hidden border shadow-sm hover:shadow-md transition-all duration-300 flex flex-row h-32">
                         <div className="relative w-32 shrink-0">
                           <Image

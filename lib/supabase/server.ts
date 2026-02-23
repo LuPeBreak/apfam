@@ -1,13 +1,11 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
-import LoginForm from './LoginForm'
 import { env } from '@/lib/env'
 
-export default async function LoginPage() {
+export async function createClient() {
   const cookieStore = await cookies()
 
-  const supabase = createServerClient(
+  return createServerClient(
     env.NEXT_PUBLIC_SUPABASE_URL,
     env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
@@ -29,12 +27,4 @@ export default async function LoginPage() {
       },
     }
   )
-
-  const { data: { session } } = await supabase.auth.getSession()
-
-  if (session) {
-    redirect('/admin')
-  }
-
-  return <LoginForm />
 }

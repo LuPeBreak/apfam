@@ -16,16 +16,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ImageUpload } from "@/components/image-upload";
 import { useEffect } from "react";
+import { slugify } from "@/lib/utils";
 
-export const eventSchema = z.object({
-  title: z.string().min(2, "O título deve ter pelo menos 2 caracteres."),
-  date: z.string().refine((val) => !isNaN(Date.parse(val)), "Data inválida."),
-  location: z.string().min(2, "O local deve ter pelo menos 2 caracteres."),
-  description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
-  imageUrl: z.string().optional(),
-});
-
-export type EventFormData = z.infer<typeof eventSchema>;
+import { eventSchema, EventFormData } from "@/lib/schemas";
 
 import { Event } from "@/types";
 
@@ -39,6 +32,7 @@ export function EventForm({ onSubmit, initialData }: EventFormProps) {
     resolver: zodResolver(eventSchema),
     defaultValues: {
       title: "",
+      slug: "",
       date: "",
       location: "",
       description: "",
@@ -59,6 +53,7 @@ export function EventForm({ onSubmit, initialData }: EventFormProps) {
 
       form.reset({
         title: initialData.title || "",
+        slug: initialData.slug || "",
         date: formattedDate,
         location: initialData.location || "",
         description: initialData.description || "",
@@ -66,6 +61,8 @@ export function EventForm({ onSubmit, initialData }: EventFormProps) {
       });
     }
   }, [initialData, form]);
+
+
 
   return (
     <Form {...form}>
@@ -77,12 +74,40 @@ export function EventForm({ onSubmit, initialData }: EventFormProps) {
             <FormItem>
               <FormLabel>Título</FormLabel>
               <FormControl>
-                <Input placeholder="Título do evento" {...field} />
+                <Input 
+                  placeholder="Título do evento" 
+                  {...field} 
+                  onChange={(e) => {
+                    field.onChange(e);
+                    // Only auto-update slug if we are creating a new event
+                    if (!initialData) {
+                      form.setValue("slug", slugify(e.target.value), { shouldValidate: true });
+                    }
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+        
+        <FormField
+          control={form.control}
+          name="slug"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Link Personalizado (Slug)</FormLabel>
+              <FormControl>
+                <Input placeholder="titulo-do-evento" {...field} />
+              </FormControl>
+               <p className="text-xs text-muted-foreground">
+                O link será: /eventos/{field.value || "..."}
+              </p>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}

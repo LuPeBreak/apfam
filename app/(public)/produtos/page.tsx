@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import { Product, Category } from "@/types";
 import { ProductWithAssociateNames, DatabaseCategory } from "@/types/supabase-custom";
-import ProductsClientPage from "./ProductsClientPage";
+import ProductsClientPage from "./_components/ProductsClientPage";
 
 export const dynamic = 'force-dynamic';
 
@@ -39,6 +39,7 @@ export default async function ProductsPage() {
     imageUrl: p.image_url,
     categoryIds: p.product_categories.map((pc) => pc.category_id),
     categoryNames: p.product_categories.map((pc) => pc.categories.name),
+    slug: p.slug,
      
     associateName: p.associate_products?.[0]?.associates?.name || "APFAM",
     associateCount: p.associate_products?.length || 0

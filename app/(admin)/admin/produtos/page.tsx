@@ -35,6 +35,7 @@ export default async function ProductsPage() {
     name: p.name,
     description: p.description || "",
     imageUrl: p.image_url,
+    slug: p.slug,
     categoryIds: p.product_categories.map((pc) => pc.category_id),
     categoryNames: p.product_categories.map((pc) => pc.categories.name),
   }));

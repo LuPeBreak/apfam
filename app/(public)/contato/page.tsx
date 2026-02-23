@@ -26,6 +26,7 @@ const formSchema = z.object({
   phone: z.string().min(10, "Telefone inválido"),
   productionType: z.string().min(2, "Tipo de produção obrigatório"),
   message: z.string().min(10, "Mensagem deve ter pelo menos 10 caracteres"),
+  _honey: z.string().optional(),
 });
 
 export default function ContactPage() {
@@ -40,6 +41,7 @@ export default function ContactPage() {
       phone: "",
       productionType: "",
       message: "",
+      _honey: "",
     },
   });
 
@@ -215,6 +217,20 @@ export default function ContactPage() {
                         </FormItem>
                       )}
                     />
+                    
+                    {/* Honeypot field (hidden) */}
+                    <FormField
+                      control={form.control}
+                      name="_honey"
+                      render={({ field }) => (
+                        <FormItem className="hidden">
+                          <FormControl>
+                            <Input {...field} autoComplete="off" tabIndex={-1} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
                     <Button type="submit" className="w-full" disabled={isLoading}>
                       {isLoading ? "Enviando..." : "Enviar Mensagem"}
                     </Button>

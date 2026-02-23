@@ -36,9 +36,11 @@ export default async function AssociatesPage() {
     bio: a.bio || "",
     location: a.location || "",
     avatarUrl: a.avatar_url,
+    slug: a.slug,
     products: a.associate_products.map((ap) => ({
       id: ap.product_id,
       name: ap.products.name,
+      slug: ap.products.slug, // Ensure products also have slug if needed by Associate type
     })),
   }));
 
@@ -47,6 +49,7 @@ export default async function AssociatesPage() {
     name: p.name,
     description: p.description || "",
     imageUrl: p.image_url,
+    slug: p.slug,
     categoryIds: [], // Not needed for this view
     categoryNames: [],
   }));

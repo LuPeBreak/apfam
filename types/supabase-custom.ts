@@ -5,6 +5,7 @@ export interface DatabaseEvent {
   location: string | null;
   description: string | null;
   image_url: string;
+  slug: string;
 }
 
 export interface DatabaseCategory {
@@ -17,6 +18,7 @@ export interface DatabaseProduct {
   name: string;
   description: string | null;
   image_url: string;
+  slug: string;
   created_at: string;
 }
 
@@ -27,6 +29,7 @@ export interface DatabaseAssociate {
   bio: string | null;
   location: string | null;
   avatar_url: string;
+  slug: string;
   created_at: string;
 }
 
@@ -47,6 +50,7 @@ export interface ProductWithCategoriesAndAssociates extends ProductWithCategorie
     associates: {
       id: string;
       name: string;
+      slug: string;
       location: string | null;
       avatar_url: string;
     };
@@ -67,12 +71,14 @@ export interface AssociateWithProducts {
   bio: string | null;
   location: string | null;
   avatar_url: string;
+  slug: string;
   created_at: string;
   associate_products: {
     product_id: string;
     products: {
       id: string;
       name: string;
+      slug: string;
     };
   }[];
 }

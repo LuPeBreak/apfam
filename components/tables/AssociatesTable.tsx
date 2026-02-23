@@ -36,7 +36,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { Combobox } from "@/components/combobox";
-import { AssociateForm, AssociateFormData } from "@/components/admin/forms/AssociateForm";
+import { AssociateForm } from "@/components/admin/forms/AssociateForm";
+import { AssociateFormData } from "@/lib/schemas";
 import { toast } from "sonner";
 import { deleteImageFromStorage } from "@/lib/storage-utils";
 
@@ -106,26 +107,40 @@ export function AssociatesTable({ initialData, catalog }: AssociatesTableProps) 
           .from("associates")
           .update({
             name: formData.name,
+            slug: formData.slug,
             bio: formData.bio,
             location: formData.location,
             avatar_url: formData.avatarUrl,
           })
           .eq("id", editingId);
         if (error) throw error;
+        setData(data.map((item) => (item.id === editingId ? { ...item, ...formData, avatarUrl: formData.avatarUrl || "", slug: formData.slug } : item)));
       } else {
         // Create associate
         const { data: newAssociate, error } = await supabase
           .from("associates")
           .insert([{
             name: formData.name,
+            slug: formData.slug,
             bio: formData.bio,
             location: formData.location,
-            avatar_url: formData.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${formData.name}`,
+            avatar_url: formData.avatarUrl || null,
           }])
           .select()
           .single();
         if (error) throw error;
         associateId = newAssociate.id;
+        setData([...data, {
+            id: newAssociate.id,
+            name: newAssociate.name,
+            bio: newAssociate.bio,
+            location: newAssociate.location,
+            avatarUrl: newAssociate.avatar_url,
+            slug: newAssociate.slug,
+            products: [] // Products are added below, but for the table view we might need to fetch them or optimistically add them if we knew safely. 
+            // For now, simpler to refresh or just add the associate basics. 
+            // Actually, the products array is needed for the table display.
+        }]);
       }
 
       if (associateId) {

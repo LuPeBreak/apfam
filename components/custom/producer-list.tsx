@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 interface Producer {
   id: string;
   name: string;
+  slug: string;
   location?: string | null;
   avatar_url?: string | null;
 }
@@ -34,7 +35,7 @@ export function ProducerList({ associates }: ProducerListProps) {
         {displayedAssociates.map((associate) => (
           <Link 
             key={associate.id}
-            href={`/associados/${associate.id}`} 
+            href={`/associados/${associate.slug}`} 
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors group border border-transparent hover:border-border"
           >
             <div className="relative h-10 w-10 rounded-full overflow-hidden border shrink-0">

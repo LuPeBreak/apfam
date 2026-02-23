@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import { Event, Associate, Product } from "@/types";
 import { DatabaseEvent, ProductWithCategories, AssociateWithProducts } from "@/types/supabase-custom";
-import HomeClientPage from "./HomeClientPage";
+import HomeClientPage from "./_components/HomeClientPage";
 
 export const dynamic = 'force-dynamic';
 
@@ -37,7 +37,8 @@ export default async function Home() {
         product_id,
         products (
           id,
-          name
+          name,
+          slug
         )
       )
     `)
@@ -50,6 +51,7 @@ export default async function Home() {
     location: e.location || "",
     description: e.description || "",
     imageUrl: e.image_url,
+    slug: e.slug,
   }));
 
   const formattedProducts: Product[] = (productsData as unknown as ProductWithCategories[] || []).map((p) => ({
@@ -59,6 +61,7 @@ export default async function Home() {
     imageUrl: p.image_url,
     categoryIds: p.product_categories.map((pc) => pc.category_id),
     categoryNames: p.product_categories.map((pc) => pc.categories.name),
+    slug: p.slug,
   }));
 
   const formattedAssociates: Associate[] = (associatesData as unknown as AssociateWithProducts[] || []).map((a) => ({
@@ -67,9 +70,11 @@ export default async function Home() {
     bio: a.bio || "",
     location: a.location || "",
     avatarUrl: a.avatar_url,
+    slug: a.slug,
     products: a.associate_products.map((ap) => ({
       id: ap.product_id,
       name: ap.products.name,
+      slug: ap.products.slug,
       categoryIds: [],
       categoryNames: []
     }))

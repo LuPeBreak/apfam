@@ -35,7 +35,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Combobox } from "@/components/combobox";
-import { ProductForm, ProductFormData } from "@/components/admin/forms/ProductForm";
+import { ProductForm } from "@/components/admin/forms/ProductForm";
+import { ProductFormData } from "@/lib/schemas";
 import { toast } from "sonner";
 import { deleteImageFromStorage } from "@/lib/storage-utils";
 
@@ -108,17 +109,20 @@ export function ProductsTable({ initialData, categories }: ProductsTableProps) {
           .from("products")
           .update({
             name: formData.name,
+            slug: formData.slug,
             description: formData.description,
             image_url: formData.imageUrl,
           })
           .eq("id", editingId);
         if (error) throw error;
+        setData(data.map((item) => (item.id === editingId ? { ...item, ...formData, imageUrl: formData.imageUrl, slug: formData.slug } : item)));
       } else {
         // Create product
         const { data: newProduct, error } = await supabase
           .from("products")
           .insert([{
             name: formData.name,
+            slug: formData.slug,
             description: formData.description,
             image_url: formData.imageUrl || "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&q=80",
           }])
@@ -126,6 +130,15 @@ export function ProductsTable({ initialData, categories }: ProductsTableProps) {
           .single();
         if (error) throw error;
         productId = newProduct.id;
+        setData([...data, {
+            id: newProduct.id,
+            name: newProduct.name,
+            description: newProduct.description,
+            imageUrl: newProduct.image_url,
+            slug: newProduct.slug,
+            categoryIds: formData.categoryIds,
+            categoryNames: [] // We'd need to map IDs to names here for full optimistic UI, but refresh covers it.
+        }]);
       }
 
       if (productId) {

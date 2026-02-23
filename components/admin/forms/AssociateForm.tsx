@@ -18,16 +18,9 @@ import { MultiSelect } from "@/components/multi-select";
 import { ImageUpload } from "@/components/image-upload";
 import { Product, Associate } from "@/types";
 import { useEffect } from "react";
+import { slugify } from "@/lib/utils";
 
-export const associateSchema = z.object({
-  name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres."),
-  bio: z.string().min(10, "A biografia deve ter pelo menos 10 caracteres."),
-  location: z.string().min(2, "A localização deve ter pelo menos 2 caracteres."),
-  productIds: z.array(z.string()),
-  avatarUrl: z.string().optional(),
-});
-
-export type AssociateFormData = z.infer<typeof associateSchema>;
+import { associateSchema, AssociateFormData } from "@/lib/schemas";
 
 interface AssociateFormProps {
   onSubmit: (data: AssociateFormData) => void;
@@ -40,6 +33,7 @@ export function AssociateForm({ onSubmit, initialData, catalog }: AssociateFormP
     resolver: zodResolver(associateSchema),
     defaultValues: {
       name: "",
+      slug: "",
       bio: "",
       location: "",
       productIds: [],
@@ -51,6 +45,7 @@ export function AssociateForm({ onSubmit, initialData, catalog }: AssociateFormP
     if (initialData) {
       form.reset({
         name: initialData.name,
+        slug: initialData.slug || "",
         bio: initialData.bio,
         location: initialData.location,
         productIds: initialData.products.map((p: Product) => p.id),
@@ -70,13 +65,38 @@ export function AssociateForm({ onSubmit, initialData, catalog }: AssociateFormP
               <FormItem>
                 <FormLabel>Nome</FormLabel>
                 <FormControl>
-                  <Input placeholder="Nome do associado" {...field} />
+                  <Input 
+                    placeholder="Nome do associado" 
+                    {...field} 
+                    onChange={(e) => {
+                      field.onChange(e);
+                      // Only auto-update slug if we are creating a new associate
+                      if (!initialData) {
+                        form.setValue("slug", slugify(e.target.value), { shouldValidate: true });
+                      }
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
           <FormField
+            control={form.control}
+            name="slug"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Link (Slug)</FormLabel>
+                <FormControl>
+                  <Input placeholder="nome-do-associado" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <FormField
             control={form.control}
             name="location"
             render={({ field }) => (
@@ -88,8 +108,8 @@ export function AssociateForm({ onSubmit, initialData, catalog }: AssociateFormP
                 <FormMessage />
               </FormItem>
             )}
-          />
-        </div>
+        />
+        
         <FormField
           control={form.control}
           name="bio"
@@ -107,12 +127,13 @@ export function AssociateForm({ onSubmit, initialData, catalog }: AssociateFormP
             </FormItem>
           )}
         />
+        
         <FormField
           control={form.control}
           name="avatarUrl"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Avatar</FormLabel>
+              <FormLabel>Foto do Associado</FormLabel>
               <FormControl>
                 <ImageUpload
                   value={field.value}

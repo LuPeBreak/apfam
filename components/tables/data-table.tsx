@@ -53,7 +53,7 @@ export function DataTable<TData, TValue>({
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
 
-  const table = useReactTable({
+  const tableOptions = React.useMemo(() => ({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
@@ -62,12 +62,14 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onGlobalFilterChange: setGlobalFilter,
-    globalFilterFn: globalFilterFn as FilterFn<TData>, // Cast to correct type
+    globalFilterFn: globalFilterFn as FilterFn<TData>,
     state: {
       sorting,
       globalFilter,
     },
-  });
+  }), [data, columns, sorting, globalFilter]);
+
+  const table = useReactTable(tableOptions);
 
   return (
     <div className="space-y-4">

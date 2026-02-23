@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { Event } from "@/types";
-import EventsClientPage from "./EventsClientPage";
+import EventsClientPage from "./_components/EventsClientPage";
 
 export const dynamic = 'force-dynamic';
 
@@ -24,7 +24,9 @@ export default async function EventsPage() {
     location: e.location || "",
     description: e.description || "",
     imageUrl: e.image_url,
+    slug: e.slug,
   }));
+
 
   return <EventsClientPage initialEvents={formattedEvents} />;
 }

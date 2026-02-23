@@ -1,17 +1,13 @@
+import { env } from "./env";
+
 export const siteConfig = {
   contact: {
-    email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "adilsonrezende@uol.com.br",
-    phone: process.env.NEXT_PUBLIC_CONTACT_PHONE || "552433415591",
-    whatsapp: process.env.NEXT_PUBLIC_CONTACT_WHATSAPP || "5524998198120",
-    address: process.env.NEXT_PUBLIC_CONTACT_ADDRESS || "Estrada da Granja n 40, Santa Rita de Cássia, Barra Mansa/RJ - CEP 27322-410",
+    email: env.NEXT_PUBLIC_CONTACT_EMAIL || "adilsonrezende@uol.com.br",
+    phone: env.NEXT_PUBLIC_CONTACT_PHONE || "552433415591",
+    whatsapp: env.NEXT_PUBLIC_CONTACT_WHATSAPP || "5524998198120",
+    address: env.NEXT_PUBLIC_CONTACT_ADDRESS || "Estrada da Granja n 40, Santa Rita de Cássia, Barra Mansa/RJ - CEP 27322-410",
   },
-  email: {
-    host: process.env.EMAIL_HOST || "smtp.mailtrap.io",
-    port: parseInt(process.env.EMAIL_PORT || "2525"),
-    user: process.env.EMAIL_USER || "placeholder_user",
-    pass: process.env.EMAIL_PASS || "placeholder_pass",
-    from: process.env.EMAIL_FROM || "noreply@apfam.com",
-  }
+  // Email config moved to lib/server-config.ts for security
 };
 
 export function formatPhoneNumber(phone: string): string {

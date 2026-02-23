@@ -1,9 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { supabase } from "@/lib/supabase";
 
-export const dynamic = 'force-dynamic';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function AdminDashboardPage() {
+  const supabase = await createClient();
   const { count: associatesCount } = await supabase.from('associates').select('*', { count: 'exact', head: true });
   const { count: eventsCount } = await supabase.from('events').select('*', { count: 'exact', head: true });
   const { count: productsCount } = await supabase.from('products').select('*', { count: 'exact', head: true });

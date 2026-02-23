@@ -1,25 +1,51 @@
-import { supabase } from "@/lib/supabase";
+import { supabaseServerPublic } from "@/lib/supabase/server-public";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar, MapPin, Clock } from "lucide-react";
 
+import { Metadata } from "next";
+
 export const dynamic = 'force-dynamic';
 
 interface EventPageProps {
   params: Promise<{
-    id: string;
+    slug: string;
   }>;
 }
 
-export default async function EventPage({ params }: EventPageProps) {
-  const { id } = await params;
-
-  const { data: event, error } = await supabase
+export async function generateMetadata({ params }: EventPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  
+  const { data: event } = await supabaseServerPublic
     .from('events')
     .select('*')
-    .eq('id', id)
+    .eq('slug', slug)
+    .single();
+
+  if (!event) {
+    return {
+      title: 'Evento não encontrado | APFAM',
+    };
+  }
+
+  return {
+    title: `${event.title} | Eventos APFAM`,
+    description: event.description || `Confira detalhes sobre o evento ${event.title}`,
+    openGraph: {
+      images: event.image_url ? [event.image_url] : [],
+    },
+  };
+}
+
+export default async function EventPage({ params }: EventPageProps) {
+  const { slug } = await params;
+
+  const { data: event, error } = await supabaseServerPublic
+    .from('events')
+    .select('*')
+    .eq('slug', slug)
     .single();
 
   if (error || !event) {

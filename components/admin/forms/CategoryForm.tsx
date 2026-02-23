@@ -15,9 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useEffect } from "react";
 
-const categorySchema = z.object({
-  name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres."),
-});
+import { categorySchema } from "@/lib/schemas";
 
 import { Category } from "@/types";
 

@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ProfileForm, ProfileFormData } from "@/components/admin/forms/ProfileForm";
+import { ProfileForm } from "@/components/admin/forms/ProfileForm";
+import { ProfileFormData } from "@/lib/schemas";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { deleteImageFromStorage } from "@/lib/storage-utils";
 
 import { User } from "@supabase/supabase-js";
 
@@ -32,10 +32,9 @@ export default function ProfilePage() {
   const handleSubmit = async (data: ProfileFormData) => {
     setSaving(true);
     try {
-      const updates: { data: { full_name: string; avatar_url: string }; password?: string } = {
+      const updates: { data: { full_name: string }; password?: string } = {
         data: {
           full_name: data.fullName,
-          avatar_url: data.avatarUrl || "",
         }
       };
 
@@ -47,10 +46,7 @@ export default function ProfilePage() {
 
       if (error) throw error;
 
-      // Delete old avatar if it was changed (even if new one is empty)
-      if (user?.user_metadata?.avatar_url && data.avatarUrl !== user.user_metadata.avatar_url) {
-        await deleteImageFromStorage(user.user_metadata.avatar_url);
-      }
+
 
       toast.success("Perfil atualizado com sucesso!");
       router.refresh();
@@ -63,7 +59,6 @@ export default function ProfilePage() {
           user_metadata: {
             ...prev.user_metadata,
             full_name: data.fullName,
-            avatar_url: data.avatarUrl,
           }
         } as User;
       });
@@ -93,7 +88,6 @@ export default function ProfilePage() {
           onSubmit={handleSubmit} 
           initialData={{
             fullName: user?.user_metadata?.full_name || "",
-            avatarUrl: user?.user_metadata?.avatar_url || "",
             email: user?.email || "",
           }}
           isLoading={saving}

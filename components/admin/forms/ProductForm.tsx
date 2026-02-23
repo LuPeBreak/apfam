@@ -18,15 +18,9 @@ import { MultiSelect } from "@/components/multi-select";
 import { ImageUpload } from "@/components/image-upload";
 import { Category, Product } from "@/types";
 import { useEffect } from "react";
+import { slugify } from "@/lib/utils";
 
-export const productSchema = z.object({
-  name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres."),
-  categoryIds: z.array(z.string()).min(1, "Selecione pelo menos uma categoria."),
-  description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
-  imageUrl: z.string().optional(),
-});
-
-export type ProductFormData = z.infer<typeof productSchema>;
+import { productSchema, ProductFormData } from "@/lib/schemas";
 
 interface ProductFormProps {
   onSubmit: (data: ProductFormData) => void;
@@ -39,6 +33,7 @@ export function ProductForm({ onSubmit, initialData, categories }: ProductFormPr
     resolver: zodResolver(productSchema),
     defaultValues: {
       name: "",
+      slug: "",
       categoryIds: [],
       description: "",
       imageUrl: "",
@@ -49,6 +44,7 @@ export function ProductForm({ onSubmit, initialData, categories }: ProductFormPr
     if (initialData) {
       form.reset({
         name: initialData.name,
+        slug: initialData.slug || "",
         categoryIds: initialData.categoryIds || [],
         description: initialData.description,
         imageUrl: initialData.imageUrl || "",
@@ -59,19 +55,44 @@ export function ProductForm({ onSubmit, initialData, categories }: ProductFormPr
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nome do Produto</FormLabel>
-              <FormControl>
-                <Input placeholder="Ex: Queijo Minas" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nome do Produto</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Ex: Queijo Minas" 
+                    {...field} 
+                    onChange={(e) => {
+                      field.onChange(e);
+                      if (!initialData) {
+                        form.setValue("slug", slugify(e.target.value), { shouldValidate: true });
+                      }
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="slug"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Link (Slug)</FormLabel>
+                <FormControl>
+                  <Input placeholder="nome-do-produto" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
         <FormField
           control={form.control}
           name="categoryIds"
