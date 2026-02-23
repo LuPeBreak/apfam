@@ -13,9 +13,9 @@ import {
   ShoppingBag,
   Tags,
   LogOut,
-  Sprout,
   User as UserIcon
 } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 
@@ -89,9 +89,11 @@ export function AdminSidebar() {
   return (
     <div className="flex flex-col h-full border-r bg-muted/10">
       <div className="p-6 border-b">
-        <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
-          <Sprout className="h-6 w-6" />
-          <span>APFAM Admin</span>
+        <Link href="/admin" className="flex items-center gap-2 font-bold text-xl text-primary">
+          <div className="relative h-8 w-24">
+            <Image src="/apfam-verde.png" alt="APFAM" fill className="object-contain" priority />
+          </div>
+          <span className="text-sm mt-1">Admin</span>
         </Link>
       </div>
       <div className="flex-1 py-6 px-4 space-y-2">

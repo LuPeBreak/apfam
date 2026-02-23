@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Menu, Sprout } from "lucide-react";
+import { Menu } from "lucide-react";
+import Image from "next/image";
 import {
   Sheet,
   SheetContent,
@@ -20,11 +21,10 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b border-primary/20 bg-primary shadow-md">
       <div className="container flex h-20 items-center justify-between">
         <div className="flex items-center gap-2">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="bg-white p-2.5 rounded-xl shadow-sm group-hover:scale-105 transition-transform duration-300">
-              <Sprout className="h-6 w-6 text-primary" />
+          <Link href="/" className="flex items-center group">
+            <div className="relative h-12 w-36 group-hover:scale-105 transition-transform duration-300">
+              <Image src="/apfam-branca.png" alt="APFAM" fill className="object-contain" priority />
             </div>
-            <span className="text-2xl font-bold text-primary-foreground tracking-tight">APFAM</span>
           </Link>
         </div>
 

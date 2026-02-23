@@ -1,12 +1,15 @@
 import { Facebook, Instagram, Mail, MapPin, Phone } from "lucide-react";
 import { siteConfig, formatPhoneNumber } from "@/lib/config";
+import Image from "next/image";
 
 export function Footer() {
   return (
     <footer className="bg-muted py-12 text-muted-foreground">
       <div className="container grid gap-8 md:grid-cols-3">
         <div>
-          <h3 className="text-lg font-bold text-foreground mb-4">APFAM</h3>
+          <div className="relative h-12 w-32 mb-4">
+            <Image src="/apfam-verde.png" alt="APFAM" fill className="object-contain object-left" />
+          </div>
           <p className="text-sm leading-relaxed">
             Associação dos Produtores Familiares de Santa Rita e Região.
             <br />

@@ -3,7 +3,6 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Sprout } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 
@@ -18,7 +17,7 @@ export function HeroSection() {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background" />
+          <div className="absolute inset-0 bg-linear-to-b from-black/60 via-black/40 to-background" />
         </div>
         
         <motion.div 
@@ -27,12 +26,9 @@ export function HeroSection() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="relative z-10 container text-center space-y-8 px-4"
         >
-          <div className="inline-block p-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-4">
-            <Sprout className="h-8 w-8 text-primary-foreground" />
+          <div className="inline-block mb-4 relative h-32 w-64 md:h-48 md:w-96 drop-shadow-lg">
+            <Image src="/apfam-branca.png" alt="APFAM Logo" fill className="object-contain" priority />
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tighter drop-shadow-lg">
-            APFAM
-          </h1>
           <p className="text-xl md:text-3xl font-light max-w-2xl mx-auto text-gray-100 drop-shadow-md leading-relaxed">
             &quot;Sempre ao lado do produtor ajudando no seu crescimento&quot;
           </p>

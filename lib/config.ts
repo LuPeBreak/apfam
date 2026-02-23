@@ -2,7 +2,7 @@ import { env } from "./env";
 
 export const siteConfig = {
   contact: {
-    email: env.NEXT_PUBLIC_CONTACT_EMAIL || "adilsonrezende@uol.com.br",
+    email: env.NEXT_PUBLIC_CONTACT_EMAIL || "contato@apfam.com.br",
     phone: env.NEXT_PUBLIC_CONTACT_PHONE || "552433415591",
     whatsapp: env.NEXT_PUBLIC_CONTACT_WHATSAPP || "5524998198120",
     address: env.NEXT_PUBLIC_CONTACT_ADDRESS || "Estrada da Granja n 40, Santa Rita de Cássia, Barra Mansa/RJ - CEP 27322-410",
