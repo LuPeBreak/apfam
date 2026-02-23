@@ -50,10 +50,13 @@ export function DataTable<TData, TValue>({
   filterSlot,
   actionSlot,
 }: DataTableProps<TData, TValue>) {
+  "use no memo";
+
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
 
-  const tableOptions = React.useMemo(() => ({
+  // eslint-disable-next-line react-hooks/incompatible-library
+  const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
@@ -67,9 +70,7 @@ export function DataTable<TData, TValue>({
       sorting,
       globalFilter,
     },
-  }), [data, columns, sorting, globalFilter]);
-
-  const table = useReactTable(tableOptions);
+  });
 
   return (
     <div className="space-y-4">
