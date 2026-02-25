@@ -10,12 +10,8 @@ const nextConfig: NextConfig = {
         hostname: "images.unsplash.com",
       },
       {
-        protocol: "http",
-        hostname: "*.212.85.12.178.sslip.io",
-      },
-      {
         protocol: "https",
-        hostname: "*.212.85.12.178.sslip.io",
+        hostname: "supabase.apfam.com.br",
       },
 
     ],
