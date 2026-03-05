@@ -20,15 +20,7 @@ export const env = createEnv({
     NEXT_PUBLIC_CONTACT_WHATSAPP: z.string().min(1),
     NEXT_PUBLIC_CONTACT_ADDRESS: z.string().min(1),
   },
-  runtimeEnv: {
-    DATABASE_URL: process.env.DATABASE_URL,
-    BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
-    NODE_ENV: process.env.NODE_ENV,
-    EMAIL_HOST: process.env.EMAIL_HOST,
-    EMAIL_PORT: process.env.EMAIL_PORT,
-    EMAIL_USER: process.env.EMAIL_USER,
-    EMAIL_PASS: process.env.EMAIL_PASS,
-    EMAIL_FROM: process.env.EMAIL_FROM,
+  experimental__runtimeEnv: {
     NEXT_PUBLIC_CONTACT_EMAIL: process.env.NEXT_PUBLIC_CONTACT_EMAIL,
     NEXT_PUBLIC_CONTACT_PHONE: process.env.NEXT_PUBLIC_CONTACT_PHONE,
     NEXT_PUBLIC_CONTACT_WHATSAPP: process.env.NEXT_PUBLIC_CONTACT_WHATSAPP,

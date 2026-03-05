@@ -138,7 +138,7 @@ async function main() {
         slug: toSlug("Feira da Agricultura Familiar 2025"),
         description:
           "A maior feira de agricultura familiar da região, reunindo produtores de toda a Serra Fluminense. Apresentações culturais, gastronomia regional e venda direta ao consumidor.",
-        date: new Date("2025-06-14T09:00:00-03:00"),
+        date: new Date("2026-06-14T09:00:00-03:00"),
         location: "Praça Central, Santa Rita de Cássia — Barra Mansa/RJ",
       },
     }),
@@ -148,7 +148,7 @@ async function main() {
         slug: toSlug("Workshop de Tecnicas de Conservacao"),
         description:
           "Oficina prática de conservas artesanais, geléias e picles. Aprenda técnicas de conservação que valorizam os produtos da estação e reduzem o desperdício.",
-        date: new Date("2024-11-23T14:00:00-03:00"),
+        date: new Date("2026-11-23T14:00:00-03:00"),
         location: "Sede da APFAM, Estrada da Granja n 40 — Barra Mansa/RJ",
       },
     }),
