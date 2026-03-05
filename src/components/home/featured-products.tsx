@@ -2,12 +2,9 @@
 
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
+import { ProductCard } from "@/components/cards/product-card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { ImagePlaceholder } from "@/components/ui/image-placeholder";
 
 // Definindo o tipo para bater com a query do Prisma que virá no page.tsx
 export type FeaturedProductProps = {
@@ -72,49 +69,7 @@ export function FeaturedProducts({
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <Card className="h-full overflow-hidden group border-border/50 hover:border-primary/50 transition-colors bg-card hover:shadow-lg">
-                <Link
-                  href={`/produtos/${product.slug}`}
-                  className="h-full flex flex-col"
-                >
-                  {/* Área da Imagem */}
-                  <div className="relative aspect-4/3 w-full overflow-hidden bg-muted">
-                    {product.imageUrl ? (
-                      <Image
-                        src={product.imageUrl}
-                        alt={product.name}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : (
-                      <ImagePlaceholder
-                        name={product.name}
-                        className="absolute inset-0"
-                        textClassName="text-4xl"
-                      />
-                    )}
-
-                    {/* Badges de Categoria flutuando na imagem */}
-                    <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-                      {product.categories.map((c) => (
-                        <Badge
-                          key={c.category.name}
-                          className="bg-secondary hover:bg-secondary text-secondary-foreground border-none"
-                        >
-                          {c.category.name}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Informações do Produto */}
-                  <CardContent className="flex-1 p-5">
-                    <h3 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors line-clamp-2">
-                      {product.name}
-                    </h3>
-                  </CardContent>
-                </Link>
-              </Card>
+              <ProductCard product={product} />
             </motion.div>
           ))}
         </div>

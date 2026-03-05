@@ -1,11 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, Leaf, MapPin } from "lucide-react";
-import Image from "next/image";
+import { ArrowRight, Leaf } from "lucide-react";
 import Link from "next/link";
+import { AssociateCard } from "@/components/cards/associate-card";
 import { Button } from "@/components/ui/button";
-import { ImagePlaceholder } from "@/components/ui/image-placeholder";
 
 export type FeaturedAssociateProps = {
   id: string;
@@ -76,39 +75,7 @@ export function FeaturedAssociates({
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <Link
-                href={`/associados/${associate.slug}`}
-                className="block group"
-              >
-                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:bg-white/20 transition-all text-center h-full flex flex-col items-center">
-                  {/* Avatar Circular */}
-                  <div className="relative w-24 h-24 mb-4 rounded-full overflow-hidden bg-white/20 flex items-center justify-center border-4 border-white/30 group-hover:scale-110 transition-transform duration-300">
-                    {associate.avatarUrl ? (
-                      <Image
-                        src={associate.avatarUrl}
-                        alt={associate.name}
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <ImagePlaceholder
-                        name={associate.name}
-                        className="absolute inset-0"
-                        textClassName="text-3xl"
-                      />
-                    )}
-                  </div>
-
-                  <h3 className="text-lg font-bold text-white mb-2">
-                    {associate.name}
-                  </h3>
-
-                  <div className="mt-auto flex items-center justify-center gap-2 text-white/70 text-sm">
-                    <MapPin className="w-4 h-4 shrink-0" />
-                    <span className="line-clamp-1">{associate.location}</span>
-                  </div>
-                </div>
-              </Link>
+              <AssociateCard associate={associate} variant="home" />
             </motion.div>
           ))}
         </div>

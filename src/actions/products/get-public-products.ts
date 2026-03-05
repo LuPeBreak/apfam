@@ -4,12 +4,23 @@ import { prisma } from "@/lib/prisma";
 
 export async function getPublicProducts({
   limit = 4,
+  search,
 }: {
   limit?: number;
+  search?: string;
 } = {}) {
   try {
     const products = await prisma.product.findMany({
-      where: { featured: true },
+      where: {
+        ...(search
+          ? {
+              OR: [
+                { name: { contains: search, mode: "insensitive" } },
+                { description: { contains: search, mode: "insensitive" } },
+              ],
+            }
+          : { featured: true }), // Se não tiver busca, pega destaques
+      },
       take: limit,
       include: {
         categories: {

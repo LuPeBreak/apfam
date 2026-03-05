@@ -4,11 +4,21 @@ import { prisma } from "@/lib/prisma";
 
 export async function getPublicAssociates({
   limit = 4,
+  search,
 }: {
   limit?: number;
+  search?: string;
 } = {}) {
   try {
     const associates = await prisma.associate.findMany({
+      where: search
+        ? {
+            OR: [
+              { name: { contains: search, mode: "insensitive" } },
+              { bio: { contains: search, mode: "insensitive" } },
+            ],
+          }
+        : undefined,
       take: limit,
       orderBy: { createdAt: "desc" },
     });
