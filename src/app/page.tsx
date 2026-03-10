@@ -16,7 +16,7 @@ export default async function Home() {
   // Disparamos as queries em paralelo para performance usando as Server Actions
   const [featuredProducts, recentEvents, featuredAssociates] =
     await Promise.all([
-      getPublicProducts({ limit: 4 }),
+      getPublicProducts({ limit: 4, featuredOnly: true }),
       getPublicEvents({ limit: 3 }),
       getPublicAssociates({ limit: 4 }),
     ]);

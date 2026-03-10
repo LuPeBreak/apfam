@@ -17,7 +17,6 @@ import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
   { name: "Home", href: "/" },
-  { name: "A Associação", href: "/sobre" },
   { name: "Produtos", href: "/produtos" },
   { name: "Eventos", href: "/eventos" },
   { name: "Produtores Associados", href: "/associados" },
@@ -33,11 +32,7 @@ export function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
+      setScrolled(window.scrollY > 50);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -62,7 +57,7 @@ export function Navbar() {
           <div className="relative w-32 h-10">
             <Image
               src="/apfam-branca.png"
-              alt="Logotipo oficial da APFAM - Associação de Produtores Familiares"
+              alt="APFAM - Logotipo oficial"
               fill
               className="object-contain object-left"
               priority

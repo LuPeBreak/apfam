@@ -91,8 +91,8 @@ export function About() {
             </div>
 
             <Button asChild size="lg" className="rounded-full px-8 h-14 group">
-              <Link href="/sobre">
-                Conheça Nossa Trajetória
+              <Link href="/contato">
+                Seja um Associado
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>

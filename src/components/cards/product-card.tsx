@@ -3,17 +3,9 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { ImagePlaceholder } from "@/components/ui/image-placeholder";
+import type { ProductModel } from "@/types/models";
 
-export type ProductCardProps = {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string | null;
-  imageUrl: string | null;
-  categories: { category: { name: string } }[];
-};
-
-export function ProductCard({ product }: { product: ProductCardProps }) {
+export function ProductCard({ product }: { product: ProductModel }) {
   return (
     <Card className="h-full overflow-hidden group border-border/50 hover:border-primary/50 transition-colors bg-card hover:shadow-lg">
       <Link href={`/produtos/${product.slug}`} className="h-full flex flex-col">

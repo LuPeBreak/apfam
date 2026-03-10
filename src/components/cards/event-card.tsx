@@ -5,17 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { ImagePlaceholder } from "@/components/ui/image-placeholder";
+import type { EventModel } from "@/types/models";
 
-export type EventCardProps = {
-  id: string;
-  name: string;
-  slug: string;
-  date: Date;
-  location: string;
-  imageUrl: string | null;
-};
-
-export function EventCard({ event }: { event: EventCardProps }) {
+export function EventCard({ event }: { event: EventModel }) {
   return (
     <Card className="h-full flex flex-col overflow-hidden bg-card border-border hover:shadow-lg transition-shadow">
       <Link href={`/eventos/${event.slug}`} className="flex-1 flex flex-col">

@@ -3,15 +3,18 @@
 import { prisma } from "@/lib/prisma";
 
 export async function getPublicProducts({
-  limit = 4,
+  limit = 100,
   search,
+  featuredOnly = false,
 }: {
   limit?: number;
   search?: string;
+  featuredOnly?: boolean;
 } = {}) {
   try {
     const products = await prisma.product.findMany({
       where: {
+        ...(featuredOnly ? { featured: true } : {}),
         ...(search
           ? {
               OR: [
@@ -19,7 +22,7 @@ export async function getPublicProducts({
                 { description: { contains: search, mode: "insensitive" } },
               ],
             }
-          : { featured: true }), // Se não tiver busca, pega destaques
+          : {}),
       },
       take: limit,
       include: {

@@ -1,6 +1,8 @@
 import { Facebook, Instagram, Mail, MapPin, Phone } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { env } from "@/lib/env";
+import { formatPhoneNumber } from "@/lib/utils";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -79,7 +81,7 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-4 h-4 shrink-0 text-white/70" />
-                <span>(24) 3341-5591</span>
+                <span>{formatPhoneNumber(env.NEXT_PUBLIC_CONTACT_PHONE)}</span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-4 h-4 shrink-0 text-white/70" />

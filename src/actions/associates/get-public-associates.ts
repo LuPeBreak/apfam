@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 
 export async function getPublicAssociates({
-  limit = 4,
+  limit = 100,
   search,
 }: {
   limit?: number;
@@ -11,14 +11,16 @@ export async function getPublicAssociates({
 } = {}) {
   try {
     const associates = await prisma.associate.findMany({
-      where: search
-        ? {
-            OR: [
-              { name: { contains: search, mode: "insensitive" } },
-              { bio: { contains: search, mode: "insensitive" } },
-            ],
-          }
-        : undefined,
+      where: {
+        ...(search
+          ? {
+              OR: [
+                { name: { contains: search, mode: "insensitive" } },
+                { bio: { contains: search, mode: "insensitive" } },
+              ],
+            }
+          : {}),
+      },
       take: limit,
       orderBy: { createdAt: "desc" },
     });

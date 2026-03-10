@@ -2,23 +2,24 @@
 
 import { motion } from "framer-motion";
 import { ArrowRight, Leaf } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export function Hero() {
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
-      {/* Imagem de Fundo (Placeholder de campo/agricultura) - 
-          O ideal será substituir por uma imagem local ou otimizada no /public/images/ 
-      */}
-      <div
-        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: "url('/images/hero-bg.jpg')",
-        }}
-      >
+      {/* Imagem de Fundo Otimizada via next/image */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/images/hero-bg.jpg"
+          alt="Paisagem agrícola"
+          fill
+          priority
+          className="object-cover"
+        />
         {/* Overlay Dark/Gradient */}
-        <div className="absolute inset-0 bg-linear-to-t from-background via-black/50 to-black/70" />
+        <div className="absolute inset-0 bg-linear-to-t from-background via-black/50 to-black/70 mix-blend-multiply" />
       </div>
 
       <div className="container relative z-10 mx-auto px-4 flex flex-col items-center justify-center text-center">

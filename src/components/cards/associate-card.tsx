@@ -2,21 +2,13 @@ import { MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { ImagePlaceholder } from "@/components/ui/image-placeholder";
-
-export type AssociateCardProps = {
-  id: string;
-  name: string;
-  slug: string;
-  location: string;
-  bio?: string | null;
-  avatarUrl: string | null;
-};
+import type { AssociateModel } from "@/types/models";
 
 export function AssociateCard({
   associate,
   variant = "default",
 }: {
-  associate: AssociateCardProps;
+  associate: AssociateModel;
   variant?: "default" | "home";
 }) {
   const isHome = variant === "home";

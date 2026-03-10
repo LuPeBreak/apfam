@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 
 export async function getPublicEvents({
-  limit,
+  limit = 100,
   search,
 }: {
   limit?: number;
@@ -12,7 +12,6 @@ export async function getPublicEvents({
   try {
     const events = await prisma.event.findMany({
       where: {
-        date: search ? undefined : { gte: new Date() }, // Se buscar pelo nome, mostra eventos passados tbm (opcional), mas vamos manter futuro ou ignorar?
         ...(search
           ? {
               OR: [
@@ -20,7 +19,7 @@ export async function getPublicEvents({
                 { location: { contains: search, mode: "insensitive" } },
               ],
             }
-          : {}),
+          : { date: { gte: new Date() } }),
       },
       take: limit,
       orderBy: { date: "asc" },

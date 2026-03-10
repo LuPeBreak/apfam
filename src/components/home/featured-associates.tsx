@@ -5,19 +5,12 @@ import { ArrowRight, Leaf } from "lucide-react";
 import Link from "next/link";
 import { AssociateCard } from "@/components/cards/associate-card";
 import { Button } from "@/components/ui/button";
-
-export type FeaturedAssociateProps = {
-  id: string;
-  name: string;
-  slug: string;
-  location: string;
-  avatarUrl: string | null;
-};
+import type { AssociateModel } from "@/types/models";
 
 export function FeaturedAssociates({
   associates,
 }: {
-  associates: FeaturedAssociateProps[];
+  associates: AssociateModel[];
 }) {
   if (!associates || associates.length === 0) return null;
 

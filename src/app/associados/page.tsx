@@ -5,13 +5,15 @@ import { SearchInput } from "@/components/ui/search-input";
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
+export const revalidate = 60; // ISR
+
 export default async function AssociatesPage(props: {
   searchParams: SearchParams;
 }) {
   const searchParams = await props.searchParams;
   const q = typeof searchParams.q === "string" ? searchParams.q : undefined;
 
-  const associates = await getPublicAssociates({ limit: 100, search: q });
+  const associates = await getPublicAssociates({ search: q });
 
   return (
     <main className="min-h-screen bg-background pb-20">

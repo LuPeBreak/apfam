@@ -5,21 +5,9 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { ProductCard } from "@/components/cards/product-card";
 import { Button } from "@/components/ui/button";
+import type { ProductModel } from "@/types/models";
 
-// Definindo o tipo para bater com a query do Prisma que virá no page.tsx
-export type FeaturedProductProps = {
-  id: string;
-  name: string;
-  slug: string;
-  imageUrl: string | null;
-  categories: { category: { name: string } }[];
-};
-
-export function FeaturedProducts({
-  products,
-}: {
-  products: FeaturedProductProps[];
-}) {
+export function FeaturedProducts({ products }: { products: ProductModel[] }) {
   if (!products || products.length === 0) return null;
 
   return (

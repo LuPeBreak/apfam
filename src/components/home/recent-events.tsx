@@ -4,17 +4,9 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { EventCard } from "@/components/cards/event-card";
 import { Button } from "@/components/ui/button";
+import type { EventModel } from "@/types/models";
 
-export type EventProps = {
-  id: string;
-  name: string;
-  slug: string;
-  date: Date;
-  location: string;
-  imageUrl: string | null;
-};
-
-export function RecentEvents({ events }: { events: EventProps[] }) {
+export function RecentEvents({ events }: { events: EventModel[] }) {
   if (!events) return null;
 
   return (

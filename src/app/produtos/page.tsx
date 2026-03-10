@@ -6,13 +6,19 @@ import { SearchInput } from "@/components/ui/search-input";
 // No Next.js 15, os searchParams devem ser sempre tipados e acessados através do await
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
+export const revalidate = 60; // ISR
+
 export default async function ProductsPage(props: {
   searchParams: SearchParams;
 }) {
   const searchParams = await props.searchParams;
   const q = typeof searchParams.q === "string" ? searchParams.q : undefined;
 
-  const products = await getPublicProducts({ limit: 100, search: q });
+  const products = await getPublicProducts({
+    limit: 100,
+    search: q,
+    featuredOnly: false,
+  });
 
   return (
     <main className="min-h-screen bg-background pb-20">
