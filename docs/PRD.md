@@ -44,7 +44,7 @@ The **APFAM Portal** (Association of Family Farmers of Santa Rita and Region) is
 
 ### 4.2. Management Module (Admin)
 *   **FR-07 (Authentication)**: Access to the dashboard must be protected by login (Email/Password via Better Auth). Sessions are persisted server-side via HttpOnly cookies. The Next.js middleware must protect all `/dashboard/*` routes and redirect unauthenticated users to `/login`. The authenticated user's role (`user` or `admin`) must be available server-side for permission checks.
-*   **FR-08 (Product Management)**: The admin must be able to **Create, Edit, and Delete** products with name, description, price (optional), image, and categories. The Slug must be generated automatically.
+*   **FR-08 (Product Management)**: The admin must be able to **Create, Edit, and Delete** products with name, description, image, and categories. The Slug must be generated automatically.
 *   **FR-09 (Event Management)**: The admin must be able to **Create, Edit, and Delete** events with date, time, location, and cover image.
 *   **FR-10 (Associate Management)**: The admin must be able to **Create, Edit, and Delete** producers with photo (avatar), biography, and location.
 *   **FR-11 (Category Management)**: The admin must be able to **Create, Edit, and Delete** product categories (e.g., Dairy, Vegetables) to organize the catalog.

@@ -32,7 +32,7 @@ export function About() {
                   Vamos usar unsplash de placeholder 
                 */}
               <Image
-                src="/images/about-farmer.jpg"
+                src="/images/about-farmer.webp"
                 alt="Produtor rural da APFAM segurando uma caixa com diversas verduras e legumes frescos, colhidos diretamente do campo."
                 width={800}
                 height={1000}

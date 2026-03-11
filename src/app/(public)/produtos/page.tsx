@@ -25,7 +25,7 @@ export default async function ProductsPage(props: {
       {/* Hero Section */}
       <section className="relative h-[50vh] min-h-[400px] md:h-[60vh] md:min-h-[500px] w-full flex flex-col items-center justify-center pt-20">
         <Image
-          src="/images/products-banner.jpg"
+          src="/images/products-banner.webp"
           alt="Nossos Produtos"
           fill
           className="object-cover"

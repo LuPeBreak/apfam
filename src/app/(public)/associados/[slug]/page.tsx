@@ -54,7 +54,7 @@ export default async function AssociateDetailPage(props: {
       <div className="relative w-full h-[50vh] min-h-[350px] bg-primary/20 overflow-hidden">
         <div className="absolute inset-0 opacity-30 mix-blend-overlay">
           <Image
-            src="/images/hero-bg.jpg"
+            src="/images/hero-bg.webp"
             alt="Fazenda"
             fill
             className="object-cover"

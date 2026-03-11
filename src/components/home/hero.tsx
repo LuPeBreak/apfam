@@ -12,7 +12,7 @@ export function Hero() {
       {/* Imagem de Fundo Otimizada via next/image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/images/hero-bg.jpg"
+          src="/images/hero-bg.webp"
           alt="Paisagem agrícola"
           fill
           priority

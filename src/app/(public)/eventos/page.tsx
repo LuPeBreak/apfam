@@ -20,7 +20,7 @@ export default async function EventsPage(props: {
       {/* Hero Section */}
       <section className="relative h-[50vh] min-h-[400px] md:h-[60vh] md:min-h-[500px] w-full flex flex-col items-center justify-center pt-20">
         <Image
-          src="/images/events-banner.jpg"
+          src="/images/events-banner.webp"
           alt="Feiras e Eventos"
           fill
           className="object-cover"

@@ -20,7 +20,7 @@ export default function ContactPage() {
         <div className="absolute inset-0 bg-primary/20" />
         <div className="absolute inset-0 opacity-20 mix-blend-overlay">
           <Image
-            src="/images/hero-bg.jpg"
+            src="/images/hero-bg.webp"
             alt="Farm background"
             fill
             className="object-cover"
