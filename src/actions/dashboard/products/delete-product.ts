@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { withPermissions } from "@/lib/auth/with-permissions";
+import { removeImage } from "@/lib/file-upload/remove-image";
 import { prisma } from "@/lib/prisma";
 
 export const deleteProduct = withPermissions(
@@ -9,8 +10,7 @@ export const deleteProduct = withPermissions(
   async (_session, id: string) => {
     const prod = await prisma.product.findUnique({ where: { id } });
     if (prod?.imageUrl) {
-      const { deleteImage } = await import("@/actions/dashboard/delete-image");
-      await deleteImage(prod.imageUrl);
+      await removeImage(prod.imageUrl);
     }
 
     await prisma.product.delete({ where: { id } });

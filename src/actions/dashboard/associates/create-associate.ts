@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import slugify from "slugify";
 import { withPermissions } from "@/lib/auth/with-permissions";
+import { saveImage } from "@/lib/file-upload/save-image";
 import { prisma } from "@/lib/prisma";
 import { associateSchema } from "@/lib/validations/associate";
 
@@ -14,13 +15,19 @@ export const createAssociate = withPermissions(
       return { error: parsed.error.flatten().fieldErrors };
     }
 
-    const data = parsed.data;
+    const { avatarUrl, ...data } = parsed.data;
     const slug = slugify(data.name, { lower: true, strict: true });
+
+    let finalAvatarUrl = null;
+    if (avatarUrl instanceof File) {
+      finalAvatarUrl = await saveImage(avatarUrl, "associates", slug);
+    }
 
     await prisma.associate.create({
       data: {
         ...data,
         slug,
+        avatarUrl: finalAvatarUrl,
       },
     });
     revalidatePath("/dashboard/associados");

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { withPermissions } from "@/lib/auth/with-permissions";
+import { removeImage } from "@/lib/file-upload/remove-image";
 import { prisma } from "@/lib/prisma";
 
 export const deleteAssociate = withPermissions(
@@ -9,8 +10,7 @@ export const deleteAssociate = withPermissions(
   async (_session, id: string) => {
     const assoc = await prisma.associate.findUnique({ where: { id } });
     if (assoc?.avatarUrl) {
-      const { deleteImage } = await import("@/actions/dashboard/delete-image");
-      await deleteImage(assoc.avatarUrl);
+      await removeImage(assoc.avatarUrl);
     }
 
     await prisma.associate.delete({ where: { id } });

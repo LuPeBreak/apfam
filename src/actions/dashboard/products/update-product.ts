@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import slugify from "slugify";
 import { withPermissions } from "@/lib/auth/with-permissions";
+import { removeImage } from "@/lib/file-upload/remove-image";
+import { saveImage } from "@/lib/file-upload/save-image";
 import { prisma } from "@/lib/prisma";
 import { productSchema } from "@/lib/validations/product";
 
@@ -14,16 +16,25 @@ export const updateProduct = withPermissions(
       return { error: parsed.error.flatten().fieldErrors };
     }
 
-    const { categoryIds, associateIds, ...data } = parsed.data;
+    const { categoryIds, associateIds, imageUrl, ...data } = parsed.data;
     const slug = slugify(data.name, { lower: true, strict: true });
 
     const oldProd = await prisma.product.findUnique({ where: { id } });
-    // Apaga imagem: quando foi trocada por outra OU foi removida (null)
-    const imageChanged =
-      oldProd?.imageUrl && oldProd.imageUrl !== data.imageUrl;
-    if (imageChanged) {
-      const { deleteImage } = await import("@/actions/dashboard/delete-image");
-      await deleteImage(oldProd.imageUrl as string);
+
+    let finalImageUrl = null;
+
+    if (imageUrl instanceof File) {
+      // Nova imagem foi enviada
+      finalImageUrl = await saveImage(imageUrl, "products", slug);
+      if (oldProd?.imageUrl) {
+        await removeImage(oldProd.imageUrl); // Limpa a velha
+      }
+    } else if (typeof imageUrl === "string") {
+      // Mesma imagem mantida
+      finalImageUrl = imageUrl;
+    } else if (!imageUrl && oldProd?.imageUrl) {
+      // Usuário apagou a imagem, limpamos do server
+      await removeImage(oldProd.imageUrl);
     }
 
     await prisma.product.update({
@@ -31,6 +42,7 @@ export const updateProduct = withPermissions(
       data: {
         ...data,
         slug,
+        imageUrl: finalImageUrl,
         categories: {
           deleteMany: {},
           create: categoryIds.map((catId) => ({ categoryId: catId })),

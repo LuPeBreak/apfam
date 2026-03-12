@@ -1,9 +1,19 @@
 "use server";
 
-import { withPermissions } from "@/lib/auth/with-permissions";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 
-export const getDashboardStats = withPermissions([], async (_session) => {
+export async function getDashboardStats() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    return redirect("/login");
+  }
+
   const [products, events, associates, categories] = await Promise.all([
     prisma.product.count(),
     prisma.event.count(),
@@ -12,4 +22,4 @@ export const getDashboardStats = withPermissions([], async (_session) => {
   ]);
 
   return { products, events, associates, categories };
-});
+}

@@ -2,15 +2,14 @@
 
 import { ImageIcon, Loader2, X } from "lucide-react";
 import Image from "next/image";
-import { type ChangeEvent, useRef, useState } from "react";
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { uploadImage } from "@/actions/dashboard/upload-image";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface ImageUploadProps {
-  value: string | null | undefined;
-  onChange: (url: string | null) => void;
+  value: string | File | null | undefined;
+  onChange: (value: string | File | null) => void;
   entity: "associates" | "events" | "products";
   maxSizeMB?: number; // padrão 5MB
   maxWidth?: number; // padrão 1000px
@@ -19,12 +18,32 @@ interface ImageUploadProps {
 export function ImageUpload({
   value,
   onChange,
-  entity,
   maxSizeMB = 5,
   maxWidth = 1000,
 }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // Se o value for string (URL que veio do banco), usa ela como preview.
+    if (typeof value === "string") {
+      setPreviewUrl(value);
+      return;
+    }
+
+    // Se o value for um File (arquivo novo em memória), cria uma temp URL.
+    if (value instanceof File) {
+      const objectUrl = URL.createObjectURL(value);
+      setPreviewUrl(objectUrl);
+
+      // Cleanup pra evitar memory leak
+      return () => URL.revokeObjectURL(objectUrl);
+    }
+
+    // Se não tiver nada (null ou undefined), reseta.
+    setPreviewUrl(null);
+  }, [value]);
 
   async function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -55,18 +74,8 @@ export function ImageUpload({
         },
       );
 
-      // 3. Upload Action
-      const formData = new FormData();
-      formData.append("file", newFile);
-
-      const result = await uploadImage(formData, entity);
-
-      if (!result || "error" in result) {
-        toast.error(result?.error || "Falha ao enviar imagem");
-      } else if (result.url) {
-        // Sucesso
-        onChange(result.url);
-      }
+      // Em vez de fazer o upload com servidor, salvamos o novo arquivo no form data (client memory)
+      onChange(newFile);
     } catch (err) {
       console.error(err);
       toast.error("Ocorreu um erro ao processar a imagem.");
@@ -76,11 +85,9 @@ export function ImageUpload({
     }
   }
 
-  async function removeImage() {
-    // Não vamos deletar do disco aqui imediatamente (fazer no submit/update da controller action é mais seguro contra abandonos de form),
-    // apenas removemos do state do formulário. A imagem ficará orfã no diretório se não submeter (limpeza cron pode apagar dps).
-    // Ou podemos deletar do disco, mas corremos risco se o user não salvar o form e a pagina já apagou a imagem q tava no BD de qlqr forma.
-    // Melhor approach sem AWS/Crony: Apagamos do field no client, o Update Action do Prisma checa se o db.url != new.url e remove o antigo.
+  function removeImage() {
+    // Apenas passamos null de volta pro form!
+    // A remoção física só vai acontecer no submit do form através da Server Action
     onChange(null);
   }
 
@@ -131,10 +138,10 @@ export function ImageUpload({
   return (
     <div className="flex flex-col gap-4">
       {/* Exibição */}
-      {value ? (
+      {previewUrl ? (
         <div className="relative h-40 w-full overflow-hidden rounded-md border bg-muted group">
           <Image
-            src={value}
+            src={previewUrl}
             alt="Upload preview"
             fill
             className="object-cover transition-transform group-hover:scale-105"

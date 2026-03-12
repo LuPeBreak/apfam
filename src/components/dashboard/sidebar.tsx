@@ -15,15 +15,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { authClient } from "@/lib/auth/auth-client";
-import { cn, getInitials } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 type NavItem = {
   label: string;
@@ -105,8 +103,6 @@ function SidebarContent({
   collapsed: boolean;
   onLinkClick?: () => void;
 }) {
-  const { data: session } = authClient.useSession();
-  const user = session?.user;
   const visibleItems = NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin);
 
   return (
@@ -142,36 +138,6 @@ function SidebarContent({
           />
         ))}
       </nav>
-
-      <div className="mt-auto px-4 pb-4">
-        {user ? (
-          <Link
-            href="/dashboard/perfil"
-            onClick={onLinkClick}
-            className={cn(
-              "flex items-center gap-3 rounded-lg border bg-card p-3 shadow-sm hover:bg-accent transition-colors",
-              collapsed && "p-2 justify-center",
-            )}
-          >
-            <Avatar className={cn("border", collapsed ? "size-8" : "size-9")}>
-              <AvatarImage src={user.image || ""} alt={user.name} />
-              <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
-            </Avatar>
-            {!collapsed && (
-              <div className="flex flex-col overflow-hidden">
-                <span className="truncate text-sm font-medium">
-                  {user.name}
-                </span>
-                <span className="truncate text-xs text-muted-foreground uppercase">
-                  {user.role === "admin" ? "Administrador" : "Usuário"}
-                </span>
-              </div>
-            )}
-          </Link>
-        ) : (
-          <div className="h-16" />
-        )}
-      </div>
     </div>
   );
 }

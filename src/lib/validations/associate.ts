@@ -7,7 +7,10 @@ export const associateSchema = z.object({
     .max(100, "Nome deve ter no máximo 100 caracteres"),
   bio: z.string().min(10, "Biografia deve ter pelo menos 10 caracteres"),
   location: z.string().min(2, "Localização é obrigatória"),
-  avatarUrl: z.string().optional().nullable(),
+  avatarUrl: z
+    .union([z.string(), z.instanceof(File)])
+    .optional()
+    .nullable(),
   whatsapp: z.string().optional().nullable(),
   phone: z.string().optional().nullable(),
   email: z

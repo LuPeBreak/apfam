@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import slugify from "slugify";
 import { withPermissions } from "@/lib/auth/with-permissions";
+import { removeImage } from "@/lib/file-upload/remove-image";
+import { saveImage } from "@/lib/file-upload/save-image";
 import { prisma } from "@/lib/prisma";
 import { associateSchema } from "@/lib/validations/associate";
 
@@ -14,17 +16,22 @@ export const updateAssociate = withPermissions(
       return { error: parsed.error.flatten().fieldErrors };
     }
 
-    const data = parsed.data;
+    const { avatarUrl, ...data } = parsed.data;
     const slug = slugify(data.name, { lower: true, strict: true });
 
-    const oldAssoc = await prisma.associate.findUnique({ where: { id } });
+    const oldAssociate = await prisma.associate.findUnique({ where: { id } });
 
-    // Apaga imagem: quando foi trocada por outra OU foi removida (null)
-    const imageChanged =
-      oldAssoc?.avatarUrl && oldAssoc.avatarUrl !== data.avatarUrl;
-    if (imageChanged) {
-      const { deleteImage } = await import("@/actions/dashboard/delete-image");
-      await deleteImage(oldAssoc.avatarUrl as string);
+    let finalAvatarUrl = null;
+
+    if (avatarUrl instanceof File) {
+      finalAvatarUrl = await saveImage(avatarUrl, "associates", slug);
+      if (oldAssociate?.avatarUrl) {
+        await removeImage(oldAssociate.avatarUrl);
+      }
+    } else if (typeof avatarUrl === "string") {
+      finalAvatarUrl = avatarUrl;
+    } else if (!avatarUrl && oldAssociate?.avatarUrl) {
+      await removeImage(oldAssociate.avatarUrl);
     }
 
     await prisma.associate.update({
@@ -32,8 +39,10 @@ export const updateAssociate = withPermissions(
       data: {
         ...data,
         slug,
+        avatarUrl: finalAvatarUrl,
       },
     });
+
     revalidatePath("/dashboard/associados");
 
     return { success: true };

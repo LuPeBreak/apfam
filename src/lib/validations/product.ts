@@ -8,7 +8,10 @@ export const productSchema = z.object({
   description: z
     .string()
     .min(10, "Descrição deve ter pelo menos 10 caracteres"),
-  imageUrl: z.string().optional().nullable(),
+  imageUrl: z
+    .union([z.string(), z.instanceof(File)])
+    .optional()
+    .nullable(),
   featured: z.boolean().optional(),
   categoryIds: z.array(z.string()).min(1, "Selecione pelo menos uma categoria"),
   associateIds: z.array(z.string()).optional(),

@@ -12,7 +12,10 @@ export const eventSchema = z.object({
     message: "Data e hora inválidas",
   }),
   location: z.string().min(2, "O local é obrigatório"),
-  imageUrl: z.string().optional().nullable(),
+  imageUrl: z
+    .union([z.string(), z.instanceof(File)])
+    .optional()
+    .nullable(),
 });
 
 export type EventFormData = z.infer<typeof eventSchema>;
