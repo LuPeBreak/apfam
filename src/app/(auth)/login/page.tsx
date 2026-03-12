@@ -34,6 +34,12 @@ function getErrorMessage(code?: string, fallback?: string): string {
   if (code && AUTH_ERROR_MESSAGES[code]) {
     return AUTH_ERROR_MESSAGES[code];
   }
+
+  // Intercept raw better-auth messages
+  if (code === "BANNED" || fallback?.toLowerCase().includes("banned")) {
+    return "Sua conta foi banida. Entre em contato com o suporte ou um administrador.";
+  }
+
   return fallback ?? "Ocorreu um erro ao fazer login. Tente novamente.";
 }
 

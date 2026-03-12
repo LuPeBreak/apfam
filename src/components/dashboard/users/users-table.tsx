@@ -1,9 +1,12 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
 import { DataTable } from "@/components/dashboard/data-table";
 import {
   getUserColumns,
@@ -20,12 +23,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth/auth-client";
 
 interface UsersTableProps {
   data: UserRow[];
   currentUserId: string;
 }
+
+const passwordSchema = z.object({
+  password: z.string().min(8, "A senha deve ter no mínimo 8 caracteres"),
+});
+
+type PasswordFormData = z.infer<typeof passwordSchema>;
 
 export function UsersTable({ data, currentUserId }: UsersTableProps) {
   const router = useRouter();
@@ -36,9 +47,41 @@ export function UsersTable({ data, currentUserId }: UsersTableProps) {
   const [selectedForBan, setSelectedForBan] = useState<UserRow | null>(null);
   const [isBanning, setIsBanning] = useState(false);
 
+  // States for Password Reset
+  const [passwordOpen, setPasswordOpen] = useState(false);
+  const [selectedForPassword, setSelectedForPassword] =
+    useState<UserRow | null>(null);
+
+  // States for Edit
+  const [editOpen, setEditOpen] = useState(false);
+  const [selectedForEdit, setSelectedForEdit] = useState<UserRow | null>(null);
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { isSubmitting: isUpdatingPassword },
+  } = useForm<PasswordFormData>({
+    resolver: zodResolver(passwordSchema),
+    defaultValues: {
+      password: "",
+    },
+  });
+
   function handleBanToggle(user: UserRow) {
     setSelectedForBan(user);
     setBanOpen(true);
+  }
+
+  function handlePasswordToggle(user: UserRow) {
+    setSelectedForPassword(user);
+    setPasswordOpen(true);
+    reset();
+  }
+
+  function handleEditToggle(user: UserRow) {
+    setSelectedForEdit(user);
+    setEditOpen(true);
   }
 
   async function confirmBanToggle() {
@@ -72,10 +115,34 @@ export function UsersTable({ data, currentUserId }: UsersTableProps) {
     }
   }
 
+  async function onPasswordSubmit(data: PasswordFormData) {
+    if (!selectedForPassword) return;
+
+    try {
+      const { error } = await authClient.admin.setUserPassword({
+        userId: selectedForPassword.id,
+        newPassword: data.password,
+      });
+
+      if (error) throw error;
+
+      toast.success("Senha atualizada com sucesso.");
+      setPasswordOpen(false);
+      reset();
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Ocorreu um erro ao atualizar a senha.";
+      toast.error(message);
+    }
+  }
+
   const columns = getUserColumns({
     currentUserId,
     onBanToggle: handleBanToggle,
-    onChangePassword: () => {},
+    onChangePassword: handlePasswordToggle,
+    onEdit: handleEditToggle,
   });
 
   return (
@@ -87,7 +154,12 @@ export function UsersTable({ data, currentUserId }: UsersTableProps) {
             Administração de acessos (Admin Only)
           </p>
         </div>
-        <Button onClick={() => setCreateOpen(true)}>
+        <Button
+          onClick={() => {
+            setSelectedForEdit(null);
+            setCreateOpen(true);
+          }}
+        >
           <Plus className="size-4 mr-2" />
           Novo usuário
         </Button>
@@ -101,6 +173,15 @@ export function UsersTable({ data, currentUserId }: UsersTableProps) {
       />
 
       <UserDialog open={createOpen} onOpenChange={setCreateOpen} />
+
+      <UserDialog
+        open={editOpen}
+        onOpenChange={(open) => {
+          setEditOpen(open);
+          if (!open) setTimeout(() => setSelectedForEdit(null), 200);
+        }}
+        userToEdit={selectedForEdit}
+      />
 
       {/* Ban / Unban Dialog */}
       <Dialog open={banOpen} onOpenChange={setBanOpen}>
@@ -129,6 +210,64 @@ export function UsersTable({ data, currentUserId }: UsersTableProps) {
               disabled={isBanning}
             >
               {selectedForBan?.banned ? "Reativar Acesso" : "Banir Usuário"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Password Reset Dialog */}
+      <Dialog open={passwordOpen} onOpenChange={setPasswordOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Alterar Senha</DialogTitle>
+            <DialogDescription>
+              Defina uma nova senha para {selectedForPassword?.name}.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form
+            id="password-form"
+            onSubmit={handleSubmit(onPasswordSubmit)}
+            className="py-4"
+          >
+            <Controller
+              name="password"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Field>
+                  <FieldLabel>Nova Senha *</FieldLabel>
+                  <Input
+                    type="password"
+                    {...field}
+                    disabled={isUpdatingPassword}
+                    placeholder="Mínimo 8 caracteres"
+                  />
+                  {fieldState.error && (
+                    <FieldError>{fieldState.error.message}</FieldError>
+                  )}
+                </Field>
+              )}
+            />
+          </form>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setPasswordOpen(false)}
+              disabled={isUpdatingPassword}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              form="password-form"
+              disabled={isUpdatingPassword}
+            >
+              {isUpdatingPassword && (
+                <Loader2 className="size-4 mr-2 animate-spin" />
+              )}
+              Salvar Nova Senha
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -3,7 +3,13 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Key, MoreHorizontal, ShieldAlert, ShieldOff } from "lucide-react";
+import {
+  Key,
+  MoreHorizontal,
+  Pencil,
+  ShieldAlert,
+  ShieldOff,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,12 +32,14 @@ interface UserColumnsProps {
   currentUserId: string;
   onBanToggle: (user: UserRow) => void;
   onChangePassword: (user: UserRow) => void;
+  onEdit: (user: UserRow) => void;
 }
 
 export function getUserColumns({
   currentUserId,
   onBanToggle,
   onChangePassword,
+  onEdit,
 }: UserColumnsProps): ColumnDef<UserRow>[] {
   return [
     {
@@ -92,6 +100,10 @@ export function getUserColumns({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => onEdit(user)}>
+                <Pencil className="size-4 mr-2" />
+                Editar
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onChangePassword(user)}>
                 <Key className="size-4 mr-2" />
                 Alterar Senha
