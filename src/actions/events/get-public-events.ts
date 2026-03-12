@@ -58,6 +58,12 @@ export async function getPublicEvents({
     } else if (dateFilter === "all") {
       // Sem filtro de data
       dateCondition = undefined;
+    } else if (dateFilter?.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      // Filtro por data específica (YYYY-MM-DD)
+      const specificDate = new Date(`${dateFilter}T00:00:00`);
+      const nextDay = new Date(specificDate);
+      nextDay.setDate(specificDate.getDate() + 1);
+      dateCondition = { gte: specificDate, lt: nextDay };
     } else {
       dateCondition = { gte: now }; // default
     }

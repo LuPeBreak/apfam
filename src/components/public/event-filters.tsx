@@ -59,7 +59,12 @@ export function EventFilters({
   const isExactDate =
     dateFilter &&
     !["all", "future", "today", "week", "month"].includes(dateFilter);
-  const exactDateValue = isExactDate ? new Date(dateFilter) : undefined;
+
+  // Append T00:00:00 to force local time parsing and prevent timezone offset issues
+  const exactDateValue =
+    isExactDate && typeof dateFilter === "string"
+      ? new Date(`${dateFilter}T00:00:00`)
+      : undefined;
 
   return (
     <div

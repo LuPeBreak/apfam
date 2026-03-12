@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# APFAM - Portal do Produtor e Associado
 
-## Getting Started
+Bem-vindo ao repositório oficial da **APFAM** (Associação de Produtores e Familiares do Agro de Barra Mansa). Esta aplicação é uma plataforma moderna para gestão de associados, produtos, categorias e eventos, oferecendo transparência e facilidade de acesso à informação.
 
-First, run the development server:
+## 🚀 Tecnologias
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+A aplicação foi construída com as tecnologias mais modernas do ecossistema Web em 2025/2026:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Framework**: [Next.js 16+](https://nextjs.org/) (App Router)
+- **Linguagem**: [TypeScript](https://www.typescriptlang.org/)
+- **Estilização**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **Componentes UI**: [Shadcn UI](https://ui.shadcn.com/)
+- **Banco de Dados**: [PostgreSQL](https://www.postgresql.org/) com [Prisma ORM](https://www.prisma.io/)
+- **Autenticação**: [Better Auth](https://www.better-auth.com/) com RBAC (Role-Based Access Control)
+- **Formulários**: [React Hook Form](https://react-hook-form.com/) & [Zod](https://zod.dev/)
+- **Gerenciamento de Estado de Query**: [nuqs](https://nuqs.47ng.com/)
+- **E-mails**: [Nodemailer](https://nodemailer.com/)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🏗️ Arquitetura e Segurança
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Segurança (Auth & RBAC)
+A aplicação implementa um sistema robusto de controle de acesso:
+- **Autenticação**: Gerenciada pelo Better Auth, garantindo sessões seguras e fluxos de login modernos.
+- **Autorização (RBAC)**: Utiliza `withPermissions` para proteger Server Actions. As permissões são granulares para recursos como `associate`, `product`, `event` e `category`.
+- **Validação de Variáveis de Ambiente**: Utiliza `@t3-oss/env-nextjs` para garantir que todas as variáveis críticas (.env) estejam presentes e válidas.
 
-## Learn More
+### Funcionalidades Principais
+- **Dashboard Administrativo**: Gestão completa de Associados, Produtos e Eventos.
+- **Upload Inteligente**: Processamento de imagens local com limpeza automática e vinculação segura aos registros.
+- **Filtros Avançados**: Busca em tempo real por texto, categorias e datas específicas usando `nuqs` para persistência na URL.
+- **SEO & Performance**: Renderização híbrida (Server/Client) otimizada para Core Web Vitals e indexação em motores de busca.
 
-To learn more about Next.js, take a look at the following resources:
+## 🛠️ Instalação e Configuração
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Clonar o Repositório**:
+   ```bash
+   git clone <repo-url>
+   cd apfam
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2. **Instalar Dependências**:
+   ```bash
+   pnpm install
+   ```
 
-## Deploy on Vercel
+3. **Configurar Variáveis de Ambiente**:
+   Copie o arquivo `.env.example` (se disponível) para `.env` e preencha as credenciais do banco de dados e autenticação.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+4. **Preparar o Banco de Dados**:
+   ```bash
+   pnpm prisma generate
+   # pnpm prisma migrate dev (Executado apenas em ambiente de desenvolvimento aprovado)
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+5. **Rodar o Servidor de Desenvolvimento**:
+   ```bash
+   pnpm dev
+   ```
+
+## 🧹 Boas Práticas e Padrões
+
+- **Linting & Formatação**: Biome JS para garantir a consistência do código.
+- **Clean Code**: Funções focadas, Server Actions tipadas e componentes reutilizáveis.
+- **Tailwind v4**: Uso massivo de variáveis CSS nativas para temas claro/escuro.
+
+---
+*Desenvolvido pela Equipe APFAM / PMBM*
