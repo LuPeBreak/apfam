@@ -12,6 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ImagePlaceholder } from "@/components/ui/image-placeholder";
 import { authClient } from "@/lib/auth/auth-client";
 
 export type EventRow = {
@@ -51,8 +52,12 @@ export function getEventColumns({
                 />
               </div>
             ) : (
-              <div className="size-12 rounded-md bg-muted flex items-center justify-center text-[10px] text-muted-foreground border">
-                Sem img
+              <div className="relative size-12 rounded-md bg-muted flex items-center justify-center overflow-hidden border">
+                <ImagePlaceholder
+                  name={name}
+                  className="absolute inset-0"
+                  textClassName="text-base"
+                />
               </div>
             )}
             <span className="font-medium text-sm line-clamp-2">{name}</span>

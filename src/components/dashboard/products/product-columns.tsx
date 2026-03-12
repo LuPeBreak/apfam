@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ImagePlaceholder } from "@/components/ui/image-placeholder";
 import { authClient } from "@/lib/auth/auth-client";
 
 export type ProductRow = {
@@ -51,8 +52,12 @@ export function getProductColumns({
                 />
               </div>
             ) : (
-              <div className="size-10 rounded-md bg-muted flex items-center justify-center text-xs text-muted-foreground border">
-                Sem img
+              <div className="relative size-10 rounded-md bg-muted flex items-center justify-center overflow-hidden border">
+                <ImagePlaceholder
+                  name={name}
+                  className="absolute inset-0"
+                  textClassName="text-sm"
+                />
               </div>
             )}
             <span className="font-medium">{name}</span>

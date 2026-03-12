@@ -1,7 +1,8 @@
 import Image from "next/image";
 import { getPublicAssociates } from "@/actions/associates/get-public-associates";
+import { getPublicProductsList } from "@/actions/products/get-public-products-list";
 import { AssociateCard } from "@/components/cards/associate-card";
-import { SearchInput } from "@/components/ui/search-input";
+import { AssociateFilters } from "@/components/public/associate-filters";
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
@@ -12,8 +13,13 @@ export default async function AssociatesPage(props: {
 }) {
   const searchParams = await props.searchParams;
   const q = typeof searchParams.q === "string" ? searchParams.q : undefined;
+  const productSlug =
+    typeof searchParams.product === "string" ? searchParams.product : undefined;
 
-  const associates = await getPublicAssociates({ search: q });
+  const [associates, products] = await Promise.all([
+    getPublicAssociates({ search: q, productSlug }),
+    getPublicProductsList(),
+  ]);
 
   return (
     <main className="min-h-screen bg-background pb-20">
@@ -39,8 +45,11 @@ export default async function AssociatesPage(props: {
       </section>
 
       {/* Floating Search Bar */}
-      <div className="container relative z-20 -mt-8 max-w-3xl mx-auto px-4 pb-12">
-        <SearchInput placeholder="Buscar produtor pelo nome..." />
+      <div className="container relative z-20 -mt-8 max-w-4xl mx-auto px-4 pb-12">
+        <AssociateFilters
+          products={products}
+          placeholder="Buscar produtor pelo nome..."
+        />
       </div>
 
       <div className="container mx-auto px-4 mt-4">

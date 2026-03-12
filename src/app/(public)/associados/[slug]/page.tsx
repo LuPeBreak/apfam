@@ -1,4 +1,4 @@
-import { Leaf, MapPin, Phone } from "lucide-react";
+import { Leaf, Mail, MapPin, Phone } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -116,11 +116,27 @@ export default async function AssociateDetailPage(props: {
                   </span>
                 </div>
               )}
+              {associate.email && (
+                <a
+                  href={`mailto:${associate.email}`}
+                  className="flex items-center bg-muted/50 px-4 py-2 rounded-full border border-border/50 hover:border-primary/50 hover:bg-muted transition-colors"
+                >
+                  <Mail className="w-4 h-4 mr-2 text-primary" />
+                  <span className="font-medium text-sm">{associate.email}</span>
+                </a>
+              )}
               {associate.whatsapp && (
-                <div className="flex items-center bg-muted/50 px-4 py-2 rounded-full border border-border/50">
-                  <Phone className="w-4 h-4 mr-2 text-primary" />
-                  <span className="font-medium text-sm">Possui WhatsApp</span>
-                </div>
+                <a
+                  href={`https://wa.me/${associate.whatsapp.replace(/\D/g, "")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center bg-muted/50 px-4 py-2 rounded-full border border-border/50 hover:border-green-500/50 hover:bg-muted transition-colors"
+                >
+                  <Phone className="w-4 h-4 mr-2 text-green-500" />
+                  <span className="font-medium text-sm">
+                    {associate.whatsapp}
+                  </span>
+                </a>
               )}
             </div>
 

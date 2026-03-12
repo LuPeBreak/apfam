@@ -5,13 +5,26 @@ import { prisma } from "@/lib/prisma";
 export async function getPublicAssociates({
   limit = 100,
   search,
+  productSlug,
 }: {
   limit?: number;
   search?: string;
+  productSlug?: string;
 } = {}) {
   try {
     const associates = await prisma.associate.findMany({
       where: {
+        ...(productSlug
+          ? {
+              products: {
+                some: {
+                  product: {
+                    slug: productSlug,
+                  },
+                },
+              },
+            }
+          : {}),
         ...(search
           ? {
               OR: [

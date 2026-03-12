@@ -1,7 +1,8 @@
 import Image from "next/image";
+import { getPublicCategories } from "@/actions/categories/get-public-categories";
 import { getPublicProducts } from "@/actions/products/get-public-products";
 import { ProductCard } from "@/components/cards/product-card";
-import { SearchInput } from "@/components/ui/search-input";
+import { ProductFilters } from "@/components/public/product-filters";
 
 // No Next.js 15, os searchParams devem ser sempre tipados e acessados através do await
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
@@ -13,12 +14,20 @@ export default async function ProductsPage(props: {
 }) {
   const searchParams = await props.searchParams;
   const q = typeof searchParams.q === "string" ? searchParams.q : undefined;
+  const categorySlug =
+    typeof searchParams.category === "string"
+      ? searchParams.category
+      : undefined;
 
-  const products = await getPublicProducts({
-    limit: 100,
-    search: q,
-    featuredOnly: false,
-  });
+  const [products, categories] = await Promise.all([
+    getPublicProducts({
+      limit: 100,
+      search: q,
+      categorySlug: categorySlug,
+      featuredOnly: false,
+    }),
+    getPublicCategories(),
+  ]);
 
   return (
     <main className="min-h-screen bg-background pb-20">
@@ -44,8 +53,11 @@ export default async function ProductsPage(props: {
       </section>
 
       {/* Floating Search Bar */}
-      <div className="container relative z-20 -mt-8 max-w-3xl mx-auto px-4 pb-12">
-        <SearchInput placeholder="Buscar produtos..." />
+      <div className="container relative z-20 -mt-8 max-w-4xl mx-auto px-4 pb-12">
+        <ProductFilters
+          categories={categories}
+          placeholder="Buscar produtos..."
+        />
       </div>
 
       <div className="container mx-auto px-4 mt-4">

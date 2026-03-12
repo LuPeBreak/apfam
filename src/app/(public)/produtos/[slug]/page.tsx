@@ -93,15 +93,22 @@ export default async function ProductDetailPage(props: {
           {/* Coluna de Info */}
           <div className="lg:col-span-5 flex flex-col justify-center">
             <div className="flex flex-wrap gap-2 mb-6">
-              {categories.map((item) => (
-                <Badge
-                  key={item.category?.id || item.category?.name}
-                  variant="secondary"
-                  className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-colors px-4 py-1.5 text-sm font-semibold rounded-full"
-                >
-                  {item.category?.name}
-                </Badge>
-              ))}
+              {categories.map((item) => {
+                if (!item.category) return null;
+                return (
+                  <Link
+                    key={item.category.id}
+                    href={`/produtos?category=${item.category.slug}`}
+                  >
+                    <Badge
+                      variant="secondary"
+                      className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-colors px-4 py-1.5 text-sm font-semibold rounded-full cursor-pointer"
+                    >
+                      {item.category.name}
+                    </Badge>
+                  </Link>
+                );
+              })}
             </div>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground mb-6 leading-tight tracking-tight">

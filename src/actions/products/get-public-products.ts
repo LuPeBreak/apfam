@@ -6,15 +6,28 @@ export async function getPublicProducts({
   limit = 100,
   search,
   featuredOnly = false,
+  categorySlug,
 }: {
   limit?: number;
   search?: string;
   featuredOnly?: boolean;
+  categorySlug?: string;
 } = {}) {
   try {
     const products = await prisma.product.findMany({
       where: {
         ...(featuredOnly ? { featured: true } : {}),
+        ...(categorySlug
+          ? {
+              categories: {
+                some: {
+                  category: {
+                    slug: categorySlug,
+                  },
+                },
+              },
+            }
+          : {}),
         ...(search
           ? {
               OR: [

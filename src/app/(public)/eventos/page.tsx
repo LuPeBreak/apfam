@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { getPublicEvents } from "@/actions/events/get-public-events";
 import { EventCard } from "@/components/cards/event-card";
-import { SearchInput } from "@/components/ui/search-input";
+import { EventFilters } from "@/components/public/event-filters";
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
@@ -12,8 +12,10 @@ export default async function EventsPage(props: {
 }) {
   const searchParams = await props.searchParams;
   const q = typeof searchParams.q === "string" ? searchParams.q : undefined;
+  const dateFilter =
+    typeof searchParams.date === "string" ? searchParams.date : undefined;
 
-  const events = await getPublicEvents({ search: q });
+  const events = await getPublicEvents({ search: q, dateFilter });
 
   return (
     <main className="min-h-screen bg-background pb-20">
@@ -39,8 +41,8 @@ export default async function EventsPage(props: {
       </section>
 
       {/* Floating Search Bar */}
-      <div className="container relative z-20 -mt-8 max-w-3xl mx-auto px-4 pb-12">
-        <SearchInput placeholder="Buscar eventos ou locais..." />
+      <div className="container relative z-20 -mt-8 max-w-4xl mx-auto px-4 pb-12">
+        <EventFilters placeholder="Buscar eventos ou locais..." />
       </div>
 
       <div className="container mx-auto px-4 mt-4">

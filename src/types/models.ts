@@ -5,7 +5,7 @@ export type ProductModel = {
   description?: string | null;
   imageUrl: string | null;
   featured: boolean;
-  categories: { category: { id: string; name: string } }[];
+  categories: { category: { id: string; name: string; slug: string } }[];
 };
 
 export type AssociateModel = {
