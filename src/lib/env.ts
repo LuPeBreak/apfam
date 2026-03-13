@@ -14,6 +14,8 @@ export const env = createEnv({
     EMAIL_USER: z.email(),
     EMAIL_PASS: z.string().min(1),
     EMAIL_FROM: z.email(),
+    ADMIN_EMAIL: z.email().optional(),
+    ADMIN_PASSWORD: z.string().min(8).optional(),
   },
   client: {
     NEXT_PUBLIC_CONTACT_EMAIL: z.email(),
