@@ -3,21 +3,8 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import {
-  Key,
-  MoreHorizontal,
-  Pencil,
-  ShieldAlert,
-  ShieldOff,
-} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { UserRowActions } from "./user-row-actions";
 
 export type UserRow = {
   id: string;
@@ -30,15 +17,11 @@ export type UserRow = {
 
 interface UserColumnsProps {
   currentUserId: string;
-  onBanToggle: (user: UserRow) => void;
-  onChangePassword: (user: UserRow) => void;
   onEdit: (user: UserRow) => void;
 }
 
 export function getUserColumns({
   currentUserId,
-  onBanToggle,
-  onChangePassword,
   onEdit,
 }: UserColumnsProps): ColumnDef<UserRow>[] {
   return [
@@ -87,53 +70,13 @@ export function getUserColumns({
     {
       id: "actions",
       header: "",
-      cell: ({ row }) => {
-        const user = row.original;
-        const isSelf = user.id === currentUserId;
-
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="size-8">
-                <MoreHorizontal className="size-4" />
-                <span className="sr-only">Ações</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onEdit(user)}>
-                <Pencil className="size-4 mr-2" />
-                Editar
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onChangePassword(user)}>
-                <Key className="size-4 mr-2" />
-                Alterar Senha
-              </DropdownMenuItem>
-              {!isSelf && (
-                <DropdownMenuItem
-                  onClick={() => onBanToggle(user)}
-                  className={
-                    user.banned
-                      ? "text-green-600 focus:text-green-600"
-                      : "text-destructive focus:text-destructive"
-                  }
-                >
-                  {user.banned ? (
-                    <>
-                      <ShieldAlert className="size-4 mr-2" />
-                      Desbanir
-                    </>
-                  ) : (
-                    <>
-                      <ShieldOff className="size-4 mr-2" />
-                      Banir
-                    </>
-                  )}
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
+      cell: ({ row }) => (
+        <UserRowActions
+          user={row.original}
+          currentUserId={currentUserId}
+          onEdit={onEdit}
+        />
+      ),
     },
   ];
 }

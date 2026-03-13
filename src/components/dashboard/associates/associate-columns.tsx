@@ -1,17 +1,9 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { authClient } from "@/lib/auth/auth-client";
 import { getInitials } from "@/lib/utils";
+import { AssociateRowActions } from "./associate-row-actions";
 
 export type AssociateRow = {
   id: string;
@@ -78,54 +70,13 @@ export function getAssociateColumns({
   cols.push({
     id: "actions",
     header: "",
-    cell: ({ row }) => {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      const { data: session } = authClient.useSession();
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      const canUpdate = session?.user.role
-        ? authClient.admin.checkRolePermission({
-            permissions: { associate: ["update"] },
-            role: session.user.role as "admin" | "user",
-          })
-        : false;
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      const canDelete = session?.user.role
-        ? authClient.admin.checkRolePermission({
-            permissions: { associate: ["delete"] },
-            role: session.user.role as "admin" | "user",
-          })
-        : false;
-
-      if (!canUpdate && !canDelete) return null;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="size-8">
-              <MoreHorizontal className="size-4" />
-              <span className="sr-only">Ações</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {canUpdate && (
-              <DropdownMenuItem onClick={() => onEdit(row.original)}>
-                <Pencil className="size-4 mr-2" />
-                Editar
-              </DropdownMenuItem>
-            )}
-            {canDelete && (
-              <DropdownMenuItem
-                onClick={() => onDelete(row.original)}
-                className="text-destructive focus:text-destructive"
-              >
-                <Trash2 className="size-4 mr-2" />
-                Excluir
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: ({ row }) => (
+      <AssociateRowActions
+        associate={row.original}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
+    ),
   });
 
   return cols;
