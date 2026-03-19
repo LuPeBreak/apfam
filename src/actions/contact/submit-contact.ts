@@ -1,22 +1,14 @@
 "use server";
 
 import { sendContactEmail } from "@/lib/mail";
-import { contactSchema } from "@/lib/validations/contact";
+import { type ContactFormData, contactSchema } from "@/lib/validations/contact";
 
-export async function submitContactForm(formData: FormData) {
-  const rawFields = {
-    name: formData.get("name"),
-    email: formData.get("email"),
-    subject: formData.get("subject"),
-    message: formData.get("message"),
-    website: formData.get("website"),
-  };
-
-  const result = contactSchema.safeParse(rawFields);
+export async function submitContactForm(data: ContactFormData) {
+  const result = contactSchema.safeParse(data);
 
   if (!result.success) {
     const error = result.error.issues[0];
-    throw new Error(error.message);
+    return { error: error.message };
   }
 
   const { name, email, subject, message, website } = result.data;
@@ -25,7 +17,7 @@ export async function submitContactForm(formData: FormData) {
   if (website) {
     console.log("Comentário ignorado. Bot detectado via Honeypot.");
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    return;
+    return { success: true };
   }
 
   try {
@@ -36,10 +28,12 @@ export async function submitContactForm(formData: FormData) {
       message,
     });
     console.log("Mensagem de contato enviada com sucesso!");
+    return { success: true };
   } catch (error) {
     console.error("Erro ao processar formulário de contato:", error);
-    throw new Error(
-      "Não foi possível enviar sua mensagem no momento. Tente novamente mais tarde.",
-    );
+    return {
+      error:
+        "Não foi possível enviar sua mensagem no momento. Tente novamente mais tarde.",
+    };
   }
 }

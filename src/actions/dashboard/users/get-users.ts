@@ -5,21 +5,23 @@ import { prisma } from "@/lib/prisma";
 
 export const getUsers = withPermissions(
   [{ resource: "user", action: ["list"] }],
-  async (_session) => {
-    if (_session.user.role !== "admin") {
-      throw new Error("Acesso negado");
+  async () => {
+    try {
+      const users = await prisma.user.findMany({
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          banned: true,
+          createdAt: true,
+        },
+      });
+      return users;
+    } catch (error) {
+      console.error("Erro ao buscar usuários:", error);
+      return { error: "Não foi possível carregar a lista de usuários." };
     }
-
-    return prisma.user.findMany({
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        banned: true,
-        createdAt: true,
-      },
-    });
   },
 );

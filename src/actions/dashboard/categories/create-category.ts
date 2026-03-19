@@ -9,17 +9,26 @@ import { categorySchema } from "@/lib/validations/category";
 export const createCategory = withPermissions(
   [{ resource: "category", action: ["create"] }],
   async (_session, formData: unknown) => {
-    const parsed = categorySchema.safeParse(formData);
-    if (!parsed.success) {
-      return { error: parsed.error.flatten().fieldErrors };
+    try {
+      const parsed = categorySchema.safeParse(formData);
+      if (!parsed.success) {
+        return { error: parsed.error.flatten().fieldErrors };
+      }
+
+      const { name } = parsed.data;
+      const slug = slugify(name, { lower: true, strict: true });
+
+      await prisma.category.create({ data: { name, slug } });
+      revalidatePath("/dashboard/categorias");
+
+      return { success: true };
+    } catch (error) {
+      console.error("Erro ao criar categoria:", error);
+      return {
+        error:
+          (error as Error).message ||
+          "Não foi possível salvar a categoria no momento.",
+      };
     }
-
-    const { name } = parsed.data;
-    const slug = slugify(name, { lower: true, strict: true });
-
-    await prisma.category.create({ data: { name, slug } });
-    revalidatePath("/dashboard/categorias");
-
-    return { success: true };
   },
 );

@@ -8,13 +8,18 @@ import { prisma } from "@/lib/prisma";
 export const deleteEvent = withPermissions(
   [{ resource: "event", action: ["delete"] }],
   async (_session, id: string) => {
-    const evt = await prisma.event.findUnique({ where: { id } });
-    if (evt?.imageUrl) {
-      await removeImage(evt.imageUrl);
-    }
+    try {
+      const evt = await prisma.event.findUnique({ where: { id } });
+      if (evt?.imageUrl) {
+        await removeImage(evt.imageUrl);
+      }
 
-    await prisma.event.delete({ where: { id } });
-    revalidatePath("/dashboard/eventos");
-    return { success: true };
+      await prisma.event.delete({ where: { id } });
+      revalidatePath("/dashboard/eventos");
+      return { success: true };
+    } catch (error) {
+      console.error("Erro ao deletar evento:", error);
+      return { error: "Não foi possível excluir o evento no momento." };
+    }
   },
 );

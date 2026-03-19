@@ -14,12 +14,17 @@ export async function getDashboardStats() {
     return redirect("/login");
   }
 
-  const [products, events, associates, categories] = await Promise.all([
-    prisma.product.count(),
-    prisma.event.count(),
-    prisma.associate.count(),
-    prisma.category.count(),
-  ]);
+  try {
+    const [products, events, associates, categories] = await Promise.all([
+      prisma.product.count(),
+      prisma.event.count(),
+      prisma.associate.count(),
+      prisma.category.count(),
+    ]);
 
-  return { products, events, associates, categories };
+    return { products, events, associates, categories };
+  } catch (error) {
+    console.error("Erro ao carregar estatísticas do dashboard:", error);
+    return { error: "Não foi possível carregar as estatísticas." };
+  }
 }

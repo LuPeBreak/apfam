@@ -27,6 +27,22 @@ function StatCard({
 export default async function DashboardPage() {
   const stats = await getDashboardStats();
 
+  if ("error" in stats) {
+    return (
+      <div className="flex flex-col gap-8">
+        <div>
+          <h2 className="text-3xl font-bold text-primary">Visão Geral</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Resumo do conteúdo cadastrado na plataforma
+          </p>
+        </div>
+        <div className="p-4 rounded-lg bg-destructive/10 text-destructive border border-destructive/20">
+          {stats.error}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-8">
       <div>
