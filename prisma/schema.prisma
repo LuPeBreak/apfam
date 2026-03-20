@@ -151,3 +151,12 @@ model AssociateProduct {
   @@id([associateId, productId])
   @@map("associate_product")
 }
+
+model SiteConfig {
+  key       String   @id
+  value     String
+  type      String
+  updatedAt DateTime @updatedAt
+
+  @@map("site_config")
+}

@@ -6,14 +6,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-const benefits = [
-  "Qualidade direto da terra",
-  "Apoio à economia local",
-  "Cultivo com respeito ao meio ambiente",
-  "Sem atravessadores",
-];
+export interface AboutProps {
+  title: string;
+  description: string;
+  image: string;
+  benefits: string[];
+}
 
-export function About() {
+export function About({ title, description, image, benefits }: AboutProps) {
   return (
     <section className="py-20 md:py-32 bg-background">
       <div className="container mx-auto px-4">
@@ -27,13 +27,9 @@ export function About() {
             className="relative"
           >
             <div className="aspect-square md:aspect-4/5 rounded-3xl overflow-hidden relative">
-              {/* 
-                  Imagem de agricultor colhendo/segurando caixa de vegetais 
-                  Vamos usar unsplash de placeholder 
-                */}
               <Image
-                src="/images/about-farmer.webp"
-                alt="Produtor rural da APFAM segurando uma caixa com diversas verduras e legumes frescos, colhidos diretamente do campo."
+                src={image}
+                alt="Produtor rural da APFAM"
                 width={800}
                 height={1000}
                 className="w-full h-full object-cover"
@@ -69,16 +65,12 @@ export function About() {
               NOSSA HISTÓRIA
             </div>
 
-            <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-6 leading-tight">
-              Semeando o <span className="text-primary">futuro</span>,
-              cultivando a <span className="text-secondary">tradição</span>.
+            <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-6 leading-tight whitespace-pre-line">
+              {title}
             </h2>
 
             <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-              A APFAM nasceu da união de trabalhadores rurais de Santa Rita de
-              Cássia e região com um objetivo comum: fortalecer a agricultura
-              familiar, promover a sustentabilidade e levar comida de verdade
-              para a mesa das pessoas.
+              {description}
             </p>
 
             <div className="grid sm:grid-cols-2 gap-4 mb-10 w-full">

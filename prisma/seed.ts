@@ -9,44 +9,37 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log("🌱 Iniciando seed de produção...");
+  console.log("🌱 Iniciando seed...");
 
-  // 1. Limpeza total do banco de dados (ordem respeitando as foreign keys)
-  console.log("  → Limpando tabelas...");
-  await prisma.associateProduct.deleteMany();
-  await prisma.productCategory.deleteMany();
-  await prisma.associate.deleteMany();
-  await prisma.event.deleteMany();
-  await prisma.product.deleteMany();
-  await prisma.category.deleteMany();
-
-  // Limpeza de tabelas do Better Auth
-  await prisma.account.deleteMany();
-  await prisma.session.deleteMany();
-  await prisma.verification.deleteMany();
-  await prisma.user.deleteMany();
-
-  // 2. Criar Admin Inicial a partir do ENV
+  // 1. Criar Admin Inicial a partir do ENV (se não existir)
   if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
-    console.log(`  → Criando admin inicial (${process.env.ADMIN_EMAIL})...`);
-
-    await auth.api.createUser({
-      body: {
-        name: "Administrador",
-        email: process.env.ADMIN_EMAIL,
-        password: process.env.ADMIN_PASSWORD,
-        role: "admin",
-      },
+    const existingAdmin = await prisma.user.findUnique({
+      where: { email: process.env.ADMIN_EMAIL },
     });
 
-    console.log(`  ✓ Admin criado com sucesso: ${process.env.ADMIN_EMAIL}`);
+    if (!existingAdmin) {
+      console.log(`  → Criando admin inicial (${process.env.ADMIN_EMAIL})...`);
+      await auth.api.createUser({
+        body: {
+          name: "Administrador",
+          email: process.env.ADMIN_EMAIL,
+          password: process.env.ADMIN_PASSWORD,
+          role: "admin",
+        },
+      });
+      console.log(`  ✓ Admin criado com sucesso: ${process.env.ADMIN_EMAIL}`);
+    } else {
+      console.log(
+        `  ℹ Admin já existe: ${process.env.ADMIN_EMAIL}, pulando criação.`,
+      );
+    }
   } else {
     console.log(
       "  ℹ ADMIN_EMAIL ou ADMIN_PASSWORD não definidos no .env, pulando criação de admin.",
     );
   }
 
-  console.log("✅ Seed de produção concluído!");
+  console.log("✅ Seed concluído!");
 }
 
 main()

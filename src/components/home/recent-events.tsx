@@ -6,7 +6,17 @@ import { EventCard } from "@/components/cards/event-card";
 import { Button } from "@/components/ui/button";
 import type { EventModel } from "@/types/models";
 
-export function RecentEvents({ events }: { events: EventModel[] }) {
+interface RecentEventsProps {
+  events: EventModel[];
+  title?: string;
+  description?: string;
+}
+
+export function RecentEvents({
+  events,
+  title = "Próximos Eventos e Feiras",
+  description = "Encontre nossos produtores nas feiras da região e participe de workshops sobre agricultura sustentável.",
+}: RecentEventsProps) {
   if (!events) return null;
 
   return (
@@ -20,7 +30,7 @@ export function RecentEvents({ events }: { events: EventModel[] }) {
             transition={{ duration: 0.5 }}
             className="text-3xl md:text-4xl font-bold text-foreground mb-4"
           >
-            Próximos Eventos e Feiras
+            {title}
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -29,8 +39,7 @@ export function RecentEvents({ events }: { events: EventModel[] }) {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-lg text-muted-foreground"
           >
-            Encontre nossos produtores nas feiras da região e participe de
-            workshops sobre agricultura sustentável.
+            {description}
           </motion.p>
         </div>
 

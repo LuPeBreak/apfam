@@ -13,6 +13,7 @@ const statement = {
   event: ["create", "read", "update", "delete", "list"],
   image: ["create", "delete"],
   stats: ["read"],
+  "site-config": ["list", "update"],
 } as const;
 
 export const ac = createAccessControl(statement);
@@ -24,6 +25,7 @@ export const user = ac.newRole({
   event: ["create", "read", "update", "delete", "list"],
   image: ["create", "delete"],
   stats: ["read"],
+  "site-config": ["list", "update"],
 });
 
 export const admin = ac.newRole({
@@ -34,6 +36,7 @@ export const admin = ac.newRole({
   event: ["create", "read", "update", "delete", "list"],
   image: ["create", "delete"],
   stats: ["read"],
+  "site-config": ["list", "update"],
 });
 
 // Tipagens

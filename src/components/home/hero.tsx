@@ -6,13 +6,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-export function Hero() {
+export interface HeroProps {
+  title: string;
+  subtitle: string;
+  badge: string;
+  background: string;
+}
+
+export function Hero({ title, subtitle, badge, background }: HeroProps) {
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
       {/* Imagem de Fundo Otimizada via next/image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/images/hero-bg.webp"
+          src={background}
           alt="Paisagem agrícola"
           fill
           priority
@@ -31,20 +38,15 @@ export function Hero() {
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-sm font-medium">
             <Leaf className="w-4 h-4 text-primary" />
-            <span>Do campo direto para a sua mesa</span>
+            <span>{badge}</span>
           </div>
 
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-6">
-            Alimento <span className="text-primary-foreground">Puro</span>,{" "}
-            <br className="hidden md:block" />
-            Cultivo com{" "}
-            <span className="text-primary-foreground">Tradição</span>.
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-6 whitespace-pre-line">
+            {title}
           </h1>
 
           <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl leading-relaxed">
-            A APFAM conecta você aos melhores produtos da agricultura familiar
-            de Santa Rita de Cássia e região. Frescor, qualidade e respeito à
-            natureza.
+            {subtitle}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">

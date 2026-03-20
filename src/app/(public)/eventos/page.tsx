@@ -1,11 +1,12 @@
-import Image from "next/image";
+import { getSiteConfigsBySection } from "@/actions/config/get-site-configs-by-section";
 import { getPublicEvents } from "@/actions/events/get-public-events";
 import { EventCard } from "@/components/cards/event-card";
 import { EventFilters } from "@/components/public/event-filters";
+import { PageHero } from "@/components/public/page-hero";
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
-export const revalidate = 60; // ISR
+export const revalidate = 60;
 
 export default async function EventsPage(props: {
   searchParams: SearchParams;
@@ -15,30 +16,21 @@ export default async function EventsPage(props: {
   const dateFilter =
     typeof searchParams.date === "string" ? searchParams.date : undefined;
 
-  const events = await getPublicEvents({ search: q, dateFilter });
+  const [events, configs] = await Promise.all([
+    getPublicEvents({ search: q, dateFilter }),
+    getSiteConfigsBySection("eventos"),
+  ]);
+
+  const configMap = Object.fromEntries(configs.map((c) => [c.key, c.value]));
 
   return (
     <main className="min-h-screen bg-background pb-20">
-      {/* Hero Section */}
-      <section className="relative h-[50vh] min-h-[400px] md:h-[60vh] md:min-h-[500px] w-full flex flex-col items-center justify-center pt-20">
-        <Image
-          src="/images/events-banner.webp"
-          alt="Feiras e Eventos"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-black/60" />
-        <div className="relative z-10 text-center px-4 max-w-3xl mt-8">
-          <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-6">
-            Feiras e Eventos
-          </h1>
-          <p className="text-lg md:text-2xl text-white/90">
-            Acompanhe onde nossos produtos estarão disponíveis e participe de
-            nossas atividades e capacitações regionais.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        title={configMap.eventos_title}
+        description={configMap.eventos_description}
+        backgroundImage={configMap.eventos_hero_image}
+        alt="Feiras e Eventos"
+      />
 
       {/* Floating Search Bar */}
       <div className="container relative z-20 -mt-8 max-w-4xl mx-auto px-4 pb-12">

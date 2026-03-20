@@ -7,7 +7,17 @@ import { ProductCard } from "@/components/cards/product-card";
 import { Button } from "@/components/ui/button";
 import type { ProductModel } from "@/types/models";
 
-export function FeaturedProducts({ products }: { products: ProductModel[] }) {
+interface FeaturedProductsProps {
+  products: ProductModel[];
+  title?: string;
+  description?: string;
+}
+
+export function FeaturedProducts({
+  products,
+  title = "Destaques da Nossa Terra",
+  description = "Cultivados com carinho pelas nossas famílias associadas. Conheça alguns dos produtos mais procurados.",
+}: FeaturedProductsProps) {
   if (!products || products.length === 0) return null;
 
   return (
@@ -22,12 +32,9 @@ export function FeaturedProducts({ products }: { products: ProductModel[] }) {
             className="max-w-2xl"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Destaques da Nossa Terra
+              {title}
             </h2>
-            <p className="text-lg text-muted-foreground">
-              Cultivados com carinho pelas nossas famílias associadas. Conheça
-              alguns dos produtos mais procurados.
-            </p>
+            <p className="text-lg text-muted-foreground">{description}</p>
           </motion.div>
 
           <motion.div

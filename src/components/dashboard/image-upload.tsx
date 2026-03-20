@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 interface ImageUploadProps {
   value: string | File | null | undefined;
   onChange: (value: string | File | null) => void;
-  entity: "associates" | "events" | "products";
+  entity: "associates" | "events" | "products" | "config";
   maxSizeMB?: number; // padrão 5MB
   maxWidth?: number; // padrão 1000px
 }

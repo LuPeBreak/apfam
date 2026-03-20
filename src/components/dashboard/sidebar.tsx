@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Menu,
   Package,
+  Settings,
   Tag,
   UserCog,
   Users,
@@ -36,6 +37,11 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Eventos", href: "/dashboard/eventos", icon: CalendarDays },
   { label: "Produtos", href: "/dashboard/produtos", icon: Package },
   { label: "Categorias", href: "/dashboard/categorias", icon: Tag },
+  {
+    label: "Configurações",
+    href: "/dashboard/config",
+    icon: Settings,
+  },
   {
     label: "Usuários",
     href: "/dashboard/usuarios",

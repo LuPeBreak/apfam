@@ -1,13 +1,13 @@
-import Image from "next/image";
 import { getPublicCategories } from "@/actions/categories/get-public-categories";
+import { getSiteConfigsBySection } from "@/actions/config/get-site-configs-by-section";
 import { getPublicProducts } from "@/actions/products/get-public-products";
 import { ProductCard } from "@/components/cards/product-card";
+import { PageHero } from "@/components/public/page-hero";
 import { ProductFilters } from "@/components/public/product-filters";
 
-// No Next.js 15, os searchParams devem ser sempre tipados e acessados através do await
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
-export const revalidate = 60; // ISR
+export const revalidate = 60;
 
 export default async function ProductsPage(props: {
   searchParams: SearchParams;
@@ -19,7 +19,7 @@ export default async function ProductsPage(props: {
       ? searchParams.category
       : undefined;
 
-  const [products, categories] = await Promise.all([
+  const [products, categories, configs] = await Promise.all([
     getPublicProducts({
       limit: 100,
       search: q,
@@ -27,30 +27,19 @@ export default async function ProductsPage(props: {
       featuredOnly: false,
     }),
     getPublicCategories(),
+    getSiteConfigsBySection("produtos"),
   ]);
+
+  const configMap = Object.fromEntries(configs.map((c) => [c.key, c.value]));
 
   return (
     <main className="min-h-screen bg-background pb-20">
-      {/* Hero Section */}
-      <section className="relative h-[50vh] min-h-[400px] md:h-[60vh] md:min-h-[500px] w-full flex flex-col items-center justify-center pt-20">
-        <Image
-          src="/images/products-banner.webp"
-          alt="Nossos Produtos"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-black/60" />
-        <div className="relative z-10 text-center px-4 max-w-3xl mt-8">
-          <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-6">
-            Nossos Produtos
-          </h1>
-          <p className="text-lg md:text-2xl text-white/90">
-            Descubra os cultivos e preparos feitos com carinho pelas nossas
-            famílias associadas, direto do campo para a sua mesa.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        title={configMap.produtos_title}
+        description={configMap.produtos_description}
+        backgroundImage={configMap.produtos_hero_image}
+        alt="Nossos Produtos"
+      />
 
       {/* Floating Search Bar */}
       <div className="container relative z-20 -mt-8 max-w-4xl mx-auto px-4 pb-12">

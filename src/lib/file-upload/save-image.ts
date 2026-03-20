@@ -5,7 +5,7 @@ import slugify from "slugify";
 
 export async function saveImage(
   file: File,
-  entity: "associates" | "events" | "products",
+  entity: "associates" | "events" | "products" | "config",
   slug: string,
 ): Promise<string> {
   if (!file.type.startsWith("image/")) {

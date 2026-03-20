@@ -7,16 +7,21 @@ import { AssociateCard } from "@/components/cards/associate-card";
 import { Button } from "@/components/ui/button";
 import type { AssociateModel } from "@/types/models";
 
+interface FeaturedAssociatesProps {
+  associates: AssociateModel[];
+  title?: string;
+  badge?: string;
+}
+
 export function FeaturedAssociates({
   associates,
-}: {
-  associates: AssociateModel[];
-}) {
+  title = "Conheça as mãos que alimentam nossa região",
+  badge = "Quem Planta",
+}: FeaturedAssociatesProps) {
   if (!associates || associates.length === 0) return null;
 
   return (
     <section className="py-20 md:py-32 bg-primary text-primary-foreground relative overflow-hidden">
-      {/* Pattern decorativo de fundo */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-0 -left-1/4 w-full aspect-square rounded-full border-100 border-white" />
         <div className="absolute -bottom-1/4 -right-1/4 w-full aspect-square rounded-full border-100 border-white" />
@@ -33,10 +38,10 @@ export function FeaturedAssociates({
           >
             <div className="inline-flex items-center gap-2 px-3 py-1 mb-4 rounded-full bg-white/10 backdrop-blur-md text-white text-sm font-medium border border-white/20">
               <Leaf className="w-4 h-4" />
-              <span>Quem Planta</span>
+              <span>{badge}</span>
             </div>
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight">
-              Conheça as mãos que alimentam nossa região
+              {title}
             </h2>
           </motion.div>
 

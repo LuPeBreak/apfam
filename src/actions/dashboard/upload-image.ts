@@ -11,7 +11,7 @@ export const uploadImage = withPermissions(
   async (
     _session,
     formData: FormData,
-    entity: "associates" | "events" | "products",
+    entity: "associates" | "events" | "products" | "config",
     slug?: string,
   ) => {
     const file = formData.get("file") as File | null;
