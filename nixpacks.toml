@@ -1,4 +1,4 @@
-# Node da linha 24 com correcoes de seguranca (24.22.1): o nixpkgs padrao do nixpacks 1.41 parou em 24.10.0.
-# Canal nixos-26.05 em 28/10/2026.
+# Node da linha 24 com correcoes de seguranca (24.22.3): o nixpkgs padrao do nixpacks 1.41 parou em 24.10.0.
+# Canal nixos-26.05 em 18/11/2026 (Node 24.22.3).
 [phases.setup]
-nixpkgsArchive = '08d3a97586f6b6343b3b5e799980773629432610'
+nixpkgsArchive = 'f68407657ad294471eb4b2e65d193df26edf729f'
